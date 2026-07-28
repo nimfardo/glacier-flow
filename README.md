@@ -1,6 +1,4 @@
-# Waypoint — A General-Purpose Template for Claude Code
-
-*(Working name — rename freely, it's one find-and-replace.)*
+# Glacier Flow — A General-Purpose Template for Claude Code
 
 A general-purpose template combining three complementary patterns:
 
