@@ -67,15 +67,17 @@ Multi-task:
 
 ## Enforcement (hook)
 
-The code gate is enforced mechanically by a PreToolUse hook (`.claude/hooks/gate-check.sh`, registered in `.claude/settings.json`): `Edit`/`Write` to `src/`, `reference/`, or `.context/` is blocked unless the sentinel file `.claude/gate-open` exists.
+The code gate is enforced mechanically by a PreToolUse hook (`.claude/hooks/gate-check.mjs`, registered in `.claude/settings.json`): `Edit`/`Write` to `src/`, `reference/`, or `.context/` is blocked unless the sentinel file `.claude/gate-open` exists. The hook runs on Node so it behaves identically on macOS, Linux, and Windows.
 
 Sentinel lifecycle:
 1. User approves the XML task → create the sentinel: `echo approved > .claude/gate-open`
 2. Execute the task, verify, commit.
-3. Delete the sentinel: `rm .claude/gate-open`. Never leave it open between tasks.
+3. Delete the sentinel: `rm .claude/gate-open` (`Remove-Item` on PowerShell). Never leave it open between tasks.
 
 The sentinel is gitignored. If the hook blocks a write you believe is exempt, check the "Which Gate Covers What" table — bookkeeping files are outside the gated paths by design.
 
 ## More
 
 Red flags, state-vs-log boundaries, when this doesn't apply, after-task checklist details → `.context/task-workflow-appendix.md` (load when needed).
+
+Which role/model executes an approved task, and when to ask before spending on a bigger one → `.context/subagent-delegation.md` (load when executing).

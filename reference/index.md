@@ -6,6 +6,7 @@
 ## Architecture
 
 - [`architecture/`](architecture/) — empty until this project needs it. The first time a file placement decision matters, document the chosen pattern here (see `architecture/README.md`). Don't pre-fill this for a project that doesn't need the ceremony.
+- [`architecture/_presets/`](architecture/_presets/) — ready-made write-ups you can adopt instead of authoring one from scratch. **Not in force** until copied up a level. Currently: Feature-Sliced Design.
 
 ## Design System
 

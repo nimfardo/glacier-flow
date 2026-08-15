@@ -9,11 +9,14 @@ A general-purpose template combining three complementary patterns:
 
 ## Lineage
 
-This template started as a fork of [dragon-ice-flow](https://github.com/niellune/dragon-ice-flow), then diverged in three ways:
+This template started as a fork of [dragon-ice-flow](https://github.com/niellune/dragon-ice-flow), then diverged in four ways:
 
-1. **Architecture is pluggable, not hardcoded.** The original bakes in Feature-Sliced Design as a non-negotiable rule. This version ships `reference/architecture/` empty — you (or Claude, with your approval) document whatever pattern fits *this* project the first time it matters, or skip it entirely for non-frontend work.
+1. **Architecture is pluggable, not hardcoded.** The original bakes in Feature-Sliced Design as a non-negotiable rule. This version ships `reference/architecture/` empty — you (or Claude, with your approval) document whatever pattern fits *this* project the first time it matters, or skip it entirely for non-frontend work. FSD is available as an inert preset in `reference/architecture/_presets/` for the projects where it does fit.
 2. **A `design-to-code` workspace was added.** Built for going from a Figma frame (or a screenshot, or "make it look like X") to working code — visual QA against the design, design tokens as the source of truth for values, and a Definition of Done that covers states (hover/empty/error/loading), not just the happy path.
-3. **The write-gate hook is bash, not PowerShell.** `.claude/hooks/gate-check.sh` works on macOS/Linux out of the box.
+3. **The write-gate hook is cross-platform.** `.claude/hooks/gate-check.mjs` runs on Node, so the gate fires identically on macOS, Linux, and Windows. The original ships PowerShell-only.
+4. **Delegation is role-based and cost-gated.** `.context/subagent-delegation.md` routes approved work by role (implementer / verifier / housekeeper) rather than by model name, and requires explicit approval before escalating to an expensive tier. The original hardcodes a fixed model lineup.
+
+Upstream is tracked by hand — the two repos share no git history, so improvements are ported file-by-file rather than merged. Last synced with dragon-ice-flow at `a54b585` (2026-08-12).
 
 The spec-driven development phasing (What → How → Task → Build) described in [intent-driven.dev's vibe-coding-vs-spec-driven-development](https://intent-driven.dev/blog/2025/12/15/vibe-coding-vs-spec-driven-development/) is already the shape of the `planning/` workspace here — story (what) → spec (how) → plan (task breakdown) → `feature-development`/`design-to-code` (build). Its core warning — *"specs and plans are not the goal, they are scaffolding"* — is enforced structurally: lightweight-story-by-default, full spec only when complexity earns it.
 
@@ -43,6 +46,7 @@ your-project/
 │   ├── glossary.md
 │   ├── task-workflow.md   ← code gate
 │   ├── task-workflow-appendix.md
+│   ├── subagent-delegation.md  ← role routing + cost gate
 │   └── housekeeping.md
 │
 ├── workspaces/            ← feature-development, design-to-code, debugging, refactoring, planning, research
@@ -146,7 +150,7 @@ The full ruleset lives in `.context/housekeeping.md`. It's a *proposal* workflow
 8. **The LLM does maintenance.** Humans curate sources; Claude handles bookkeeping.
 
 ### Discipline
-9. **The gate.** No writes to a gated surface without approval — `src/`/`reference/`/`.context/` need an XML task; `planning/` and `wiki/` have their own gates; task bookkeeping (`STATE.md`, `TaskList.md`, `wiki/log.md`) is exempt. Canonical table: `.context/task-workflow.md`. Reads are free. Enforced mechanically — see `.claude/hooks/gate-check.sh`.
+9. **The gate.** No writes to a gated surface without approval — `src/`/`reference/`/`.context/` need an XML task; `planning/` and `wiki/` have their own gates; task bookkeeping (`STATE.md`, `TaskList.md`, `wiki/log.md`) is exempt. Canonical table: `.context/task-workflow.md`. Reads are free. Enforced mechanically — see `.claude/hooks/gate-check.mjs`.
 10. **State vs Log.** `STATE.md` = now (overwrite). `wiki/log.md` = past (append). `TaskList.md` = in-flight.
 11. **One task, one commit.** No opportunistic refactoring; no combined tasks.
 12. **Architecture is earned, not assumed.** Don't decide `src/` structure until a real file needs a home; then write it down once in `reference/architecture/` and don't re-litigate it.
