@@ -18,6 +18,7 @@ Workspaces frame a whole task. Skills are invoked briefly within one, then you r
 |---|---|
 | Building a new feature (and the "what" is clear) | `workspaces/feature-development/CONTEXT.md` |
 | Turning a Figma design (or screenshot/mock) into working code | `workspaces/design-to-code/CONTEXT.md` |
+| Authoring *in* Figma — pushing screens, components, or tokens into a design file | `workspaces/design-authoring/CONTEXT.md` |
 | Defining what to build — user stories, specs, task plans | `workspaces/planning/CONTEXT.md` |
 | Exploring possibilities before committing | `skills/brainstorm/SKILL.md` |
 | Fixing a bug | `workspaces/debugging/CONTEXT.md` |

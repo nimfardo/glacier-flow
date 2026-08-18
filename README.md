@@ -9,12 +9,13 @@ A general-purpose template combining three complementary patterns:
 
 ## Lineage
 
-This template started as a fork of [dragon-ice-flow](https://github.com/niellune/dragon-ice-flow), then diverged in four ways:
+This template started as a fork of [dragon-ice-flow](https://github.com/niellune/dragon-ice-flow), then diverged in five ways:
 
 1. **Architecture is pluggable, not hardcoded.** The original bakes in Feature-Sliced Design as a non-negotiable rule. This version ships `reference/architecture/` empty — you (or Claude, with your approval) document whatever pattern fits *this* project the first time it matters, or skip it entirely for non-frontend work. FSD is available as an inert preset in `reference/architecture/_presets/` for the projects where it does fit.
 2. **A `design-to-code` workspace was added.** Built for going from a Figma frame (or a screenshot, or "make it look like X") to working code — visual QA against the design, design tokens as the source of truth for values, and a Definition of Done that covers states (hover/empty/error/loading), not just the happy path.
 3. **The write-gate hook is cross-platform.** `.claude/hooks/gate-check.mjs` runs on Node, so the gate fires identically on macOS, Linux, and Windows. The original ships PowerShell-only.
 4. **Delegation is role-based and cost-gated.** `.context/subagent-delegation.md` routes approved work by role (implementer / verifier / housekeeper) rather than by model name, and requires explicit approval before escalating to an expensive tier. The original hardcodes a fixed model lineup.
+5. **A `design-authoring` workspace was added** — the reverse of `design-to-code`: agent-scripted authoring *in* Figma (screens, components, variables) via the Plugin API. It treats the Figma file as a gated production surface, encodes the Plugin API rules that fail silently when ignored (font loading, auto-layout property order, staged builds), verifies mutations with property reads instead of screenshots, and keeps a growing known-failure-patterns table. The tool-convention approach is distilled from [figmosha2](https://github.com/denysosadchyi/figmosha2)'s conventions plus accumulated project experience.
 
 Upstream is tracked by hand — the two repos share no git history, so improvements are ported file-by-file rather than merged. Last synced with dragon-ice-flow at `a54b585` (2026-08-12).
 
@@ -49,7 +50,7 @@ your-project/
 │   ├── subagent-delegation.md  ← role routing + cost gate
 │   └── housekeeping.md
 │
-├── workspaces/            ← feature-development, design-to-code, debugging, refactoring, planning, research
+├── workspaces/            ← feature-development, design-to-code, design-authoring, debugging, refactoring, planning, research
 ├── skills/                ← brainstorm (and future skills)
 ├── planning/              ← stories, specs, plans (each with index.md)
 ├── reference/              ← deep docs YOU wrote, incl. architecture/ (empty until you decide)
@@ -117,6 +118,7 @@ Just describe what you need. Claude will pick the workspace silently. Examples:
 |---|---|
 | "I want to add export to dashboards" | feature-development workspace, XML task proposed |
 | "Implement this Figma frame" (link or screenshot) | design-to-code workspace, visual QA in the DoD |
+| "Build this component set in Figma" | design-authoring workspace, gated Figma mutations, verified by property reads |
 | "There's a weird bug with login" | debugging workspace, diagnostic questions |
 | "Let's think through options for caching" | brainstorm skill, divergent mode |
 | "Let me write a story for export" | planning workspace, story format |
