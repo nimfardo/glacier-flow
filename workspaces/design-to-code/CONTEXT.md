@@ -21,7 +21,7 @@ Before any file write: follow `.context/task-workflow.md`. Same `<task>`/`<plan>
 
 ## Prerequisite: Reading the Design
 
-If the source is a Figma file, this project has Figma MCP tools available. **Load the `figma-design-to-code` skill before calling `get_design_context`** — it is a mandatory prerequisite for that tool and covers how to pull design context correctly. Don't hand-translate a screenshot when the real Figma file and its variables are reachable — get the actual values (spacing, color, type) from Figma rather than eyeballing a screenshot.
+If the source is a Figma file, check `reference/toolbox.md` (if it exists) for the Figma MCP row's status before assuming the tools are available this session — use its recorded answer instead of re-discovering availability every time. **Load the `figma-design-to-code` skill before calling `get_design_context`** — it is a mandatory prerequisite for that tool and covers how to pull design context correctly. Don't hand-translate a screenshot when the real Figma file and its variables are reachable — get the actual values (spacing, color, type) from Figma rather than eyeballing a screenshot.
 
 If the source is a screenshot or informal reference with no Figma file behind it, say so explicitly in the task's `<assumptions>` — measurements and colors are estimates, not ground truth.
 
@@ -34,6 +34,8 @@ If the source is a screenshot or informal reference with no Figma file behind it
 5. **Visual QA in a real browser** before calling it done — per the project-wide rule that UI changes get checked in a running app, not just inferred from the diff. Compare side-by-side against the design source.
 6. **Update `reference/design-system.md`** if a new token was introduced (separate write, still under this task if it's the same `<files><write>` list — don't silently expand scope).
 
+**Rolling out to many similar screens/components?** Don't repeat the same decision N times sequentially. Build and get sign-off on one sample first — it sets the conventions. Then fan out parallel subagents against that approved sample plus this file, and collect their findings as one defect list before fixing anything. Fix at the source (the token or component), not per screen.
+
 ## Definition of Done
 
 - [ ] Matches the design source for the states it actually defines (don't invent pixel precision the source doesn't have)
@@ -43,12 +45,15 @@ If the source is a screenshot or informal reference with no Figma file behind it
 - [ ] Semantic HTML first; ARIA only where semantic HTML can't express the interaction
 - [ ] Verified in an actual browser at the breakpoints the design specifies (or, absent breakpoint frames, flagged as an open question rather than guessed)
 - [ ] Tests pass, no TypeScript/lint errors (same bar as `feature-development`)
+- [ ] No leftover placeholder copy: `grep -rniE "lorem|ipsum|placeholder"` on the touched files returns nothing
+- [ ] No stray hardcoded value duplicating an existing token: touched files spot-checked against `reference/design-system.md`
 
 ## Files to Load
 
 | Working on... | Load |
 |---|---|
 | Any design-to-code task | This file + `reference/design-system.md` (if it exists) |
+| A Figma source | `reference/toolbox.md` (if it exists) — check MCP tool status before assuming availability |
 | Where the new file goes | `reference/architecture/` (if it exists — see `CONTEXT.md`) |
 | A component reused across the app | `reference/ui-patterns.md` (if it exists) |
 
