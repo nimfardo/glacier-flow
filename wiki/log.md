@@ -28,3 +28,10 @@
 **Contradicts:** `.context/rules.md:9` (pre-edit) — "Never push directly to `main` / `master`." — triggered a second time by the same push request right after the prior exception.
 **Option:** spec-update
 **Propagated:** `.context/rules.md` rule 2 rewritten: direct pushes to `main` are allowed for this repo (solo maintenance, no branch protection), confirm before each push, never force-push.
+
+## [2026-08-28] decision | rule 2 relaxation reversed — back to branch + PR
+
+**Decided:** "Actually follow the rule this time — move this commit to a branch, push the branch, open a PR into main."
+**Contradicts:** the decision immediately above (this same log, "rule 2 relaxed"), reversed rather than edited.
+**Option:** spec-update
+**Propagated:** `.context/rules.md` rule 2 restored and sharpened: never push directly to `main` — branch, push the branch, open a PR. This batch of commits moves to a branch instead of staying on local `main`.
