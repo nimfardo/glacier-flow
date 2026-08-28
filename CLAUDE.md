@@ -26,9 +26,10 @@
 **`.context/`** — canonical project rules:
 - `identity.md` · `rules.md` · `glossary.md`
 - `task-workflow.md` (gate; always-load) · `task-workflow-appendix.md` (on-demand)
+- `subagent-delegation.md` (on-demand; role routing + cost gate for executing approved tasks)
 - `housekeeping.md` (on-demand)
 
-**`workspaces/`** — task-type contexts: `feature-development/`, `design-to-code/`, `debugging/`, `refactoring/`, `planning/`, `research/`
+**`workspaces/`** — task-type contexts: `feature-development/`, `design-to-code/`, `design-authoring/`, `debugging/`, `refactoring/`, `planning/`, `research/`
 
 **`skills/`** — on-demand thinking: `brainstorm/`
 

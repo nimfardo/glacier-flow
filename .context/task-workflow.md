@@ -15,6 +15,7 @@ The gate fires whether the conversation has been plain or structured. If the con
 | Surface | Gate | Defined in |
 |---|---|---|
 | `src/`, `reference/`, `.context/` | `<task>` / `<plan>` | this file |
+| Figma files (mutations via MCP/plugin tools) | `<task>` / `<plan>` | this file + `workspaces/design-authoring/CONTEXT.md` |
 | `planning/` | `<planning-task>` | `workspaces/planning/CONTEXT.md` |
 | `wiki/` (multi-page: ingest, lint fixes) | `<ingest>` | `workspaces/research/CONTEXT.md` |
 | `wiki/` (single-page query filing) | One-line confirmation | `workspaces/research/CONTEXT.md` |
@@ -23,6 +24,8 @@ The gate fires whether the conversation has been plain or structured. If the con
 The exemption covers only the bookkeeping an approved task's checklist demands (board moves, state updates, log appends, index entries). It is not a side door for content changes.
 
 `design-to-code` and `feature-development` both write to `src/` — same gate, same table row. `design-to-code` just starts from a Figma frame instead of a written spec; see `workspaces/design-to-code/CONTEXT.md`.
+
+Figma mutations go through tool calls, not `Edit`/`Write`, so the hook (below) cannot intercept them — that row is enforced by convention only. Same wrapper, same approval; see `workspaces/design-authoring/CONTEXT.md`.
 
 The `<brainstorm>` wrapper in `skills/brainstorm/SKILL.md` is a declaration, not a gate.
 
@@ -67,15 +70,17 @@ Multi-task:
 
 ## Enforcement (hook)
 
-The code gate is enforced mechanically by a PreToolUse hook (`.claude/hooks/gate-check.sh`, registered in `.claude/settings.json`): `Edit`/`Write` to `src/`, `reference/`, or `.context/` is blocked unless the sentinel file `.claude/gate-open` exists.
+The code gate is enforced mechanically by a PreToolUse hook (`.claude/hooks/gate-check.mjs`, registered in `.claude/settings.json`): `Edit`/`Write` to `src/`, `reference/`, or `.context/` is blocked unless the sentinel file `.claude/gate-open` exists. The hook runs on Node so it behaves identically on macOS, Linux, and Windows.
 
 Sentinel lifecycle:
 1. User approves the XML task → create the sentinel: `echo approved > .claude/gate-open`
 2. Execute the task, verify, commit.
-3. Delete the sentinel: `rm .claude/gate-open`. Never leave it open between tasks.
+3. Delete the sentinel: `rm .claude/gate-open` (`Remove-Item` on PowerShell). Never leave it open between tasks.
 
 The sentinel is gitignored. If the hook blocks a write you believe is exempt, check the "Which Gate Covers What" table — bookkeeping files are outside the gated paths by design.
 
 ## More
 
 Red flags, state-vs-log boundaries, when this doesn't apply, after-task checklist details → `.context/task-workflow-appendix.md` (load when needed).
+
+Which role/model executes an approved task, and when to ask before spending on a bigger one → `.context/subagent-delegation.md` (load when executing).
