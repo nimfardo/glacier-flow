@@ -127,6 +127,6 @@ If you blow a hard limit, that's the trigger for a housekeep pass whether or not
 
 - **Weekly:** Rules 1 + 5 (the lightweight ones — STATE and trim windows)
 - **Monthly:** All five rules
-- **Quarterly:** Plus a `planning/_archive/` batch and a `reference/_archive/` review
+- **Quarterly:** Plus a `planning/_archive/` batch and a `reference/_archive/` review, and a doc-fitness check — spawn a fresh agent with no conversation context and have it complete one real task using only `reference/` and `wiki/index.md`. If it can't, the gap gets fixed by writing better docs, not by explaining verbally next session.
 
 Set a recurring reminder. Real projects rarely housekeep when "needed" because it never feels urgent — schedule it.
