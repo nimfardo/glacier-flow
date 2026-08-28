@@ -9,11 +9,12 @@ A general-purpose template combining three complementary patterns:
 
 ## Lineage
 
-This template started as a fork of [dragon-ice-flow](https://github.com/niellune/dragon-ice-flow), then diverged in three ways:
+This template started as a fork of [dragon-ice-flow](https://github.com/niellune/dragon-ice-flow), then diverged in four ways:
 
 1. **Architecture is pluggable, not hardcoded.** The original bakes in Feature-Sliced Design as a non-negotiable rule. This version ships `reference/architecture/` empty — you (or Claude, with your approval) document whatever pattern fits *this* project the first time it matters, or skip it entirely for non-frontend work.
 2. **A `design-to-code` workspace was added.** Built for going from a Figma frame (or a screenshot, or "make it look like X") to working code — visual QA against the design, design tokens as the source of truth for values, and a Definition of Done that covers states (hover/empty/error/loading), not just the happy path.
 3. **The write-gate hook is bash, not PowerShell.** `.claude/hooks/gate-check.sh` works on macOS/Linux out of the box.
+4. **A contradiction guard was added.** A request that contradicts a decision already written in `reference/` or `.context/` gets surfaced, not silently applied or silently dropped (`.context/rules.md`, non-negotiable 6). It reuses `wiki/log.md`'s existing, already-windowed `decision` entries rather than adding a new always-growing file.
 
 The spec-driven development phasing (What → How → Task → Build) described in [intent-driven.dev's vibe-coding-vs-spec-driven-development](https://intent-driven.dev/blog/2025/12/15/vibe-coding-vs-spec-driven-development/) is already the shape of the `planning/` workspace here — story (what) → spec (how) → plan (task breakdown) → `feature-development`/`design-to-code` (build). Its core warning — *"specs and plans are not the goal, they are scaffolding"* — is enforced structurally: lightweight-story-by-default, full spec only when complexity earns it.
 

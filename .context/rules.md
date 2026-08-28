@@ -10,6 +10,7 @@
 3. Never delete files without explicit user confirmation.
 4. Never invent function/library names — verify they exist.
 5. Always read a file before editing it.
+6. A request that contradicts a decision already written in `reference/` or `.context/` is never silently applied or silently ignored — surface the conflict with the file:line it contradicts, offer to update the source / log a one-off exception / withdraw, and log the resolution as a `decision` entry in `wiki/log.md`.
 
 ## Architecture
 - This template does not hardcode a frontend architecture. The first time `src/` needs a real decision (where does this file go?), decide once, write it to `reference/architecture/[pattern-name].md`, and follow it from then on — see `CONTEXT.md` → "If `reference/architecture/` Is Empty".
