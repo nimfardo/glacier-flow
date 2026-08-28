@@ -1,5 +1,7 @@
 # Glacier Flow — A General-Purpose Template for Claude Code
 
+![Glacier Flow](https://repository-images.githubusercontent.com/1314860088/d236bc35-3458-4687-a002-5a93777a3cb3)
+
 A general-purpose template combining three complementary patterns:
 
 - **Folder-based routing** (ICM, Van Clief) — *how* the AI does work
