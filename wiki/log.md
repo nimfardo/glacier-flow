@@ -21,3 +21,10 @@
 **Contradicts:** `.context/rules.md:9` — "Never push directly to `main` / `master`."
 **Option:** exception
 **Propagated:** none — `main` pushed as-is for this session's 3 commits; the rule stays in force, future work should use a branch + PR.
+
+## [2026-08-28] decision | rule 2 relaxed — direct pushes to main are fine here
+
+**Decided:** "option 1, fix the rule"
+**Contradicts:** `.context/rules.md:9` (pre-edit) — "Never push directly to `main` / `master`." — triggered a second time by the same push request right after the prior exception.
+**Option:** spec-update
+**Propagated:** `.context/rules.md` rule 2 rewritten: direct pushes to `main` are allowed for this repo (solo maintenance, no branch protection), confirm before each push, never force-push.

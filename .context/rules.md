@@ -6,7 +6,7 @@
 
 ## Non-Negotiables (always loaded)
 1. Never commit secrets, API keys, or `.env` files.
-2. Never push directly to `main` / `master`.
+2. Direct pushes to `main` are fine for this repo — solo template maintenance, no branch protection in practice. Always confirm with the user before each push; never force-push.
 3. Never delete files without explicit user confirmation.
 4. Never invent function/library names — verify they exist.
 5. Always read a file before editing it.
