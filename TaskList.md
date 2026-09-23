@@ -50,6 +50,7 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 - [ ] plan #2 (records): reference/adr/, STATE NEXT ACTION — the log archive and grep-only rule are deferred until the log has volume
 - [ ] gates.mjs records the *first* line of output as evidence; the line that matched EXPECT would be better evidence (feat-007 G1 recorded a per-suite count, not the total)
+- [ ] README.md and SETUP.md are in no gate row — neither gated nor listed as exempt, the same hole `.claude/` was in before ref-002
 - [ ] add a standing gate that every commit SHA on the board resolves (`git cat-file -t`) — two were written from memory on 2026-09-23 and only caught by a manual check
 - [ ] dogfood the template on a real project — every gate so far is verified against a repo with an empty src/ and no test lane
 
