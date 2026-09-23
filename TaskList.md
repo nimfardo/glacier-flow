@@ -38,13 +38,16 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Active work. Should usually have exactly 1 item. More than 2 = drift.*
 
-- [ ] [task-id] — [one-line goal] *(started: YYYY-MM-DD)*
+- [ ] feat-001 — gate ledger format doc (`.context/gates-ledger.md`) *(started: 2026-09-23)*
 
 ## Ready
 
 *Approved XML tasks, not yet started. Pick from the top.*
 
-- [ ] [task-id] — [one-line goal]
+- [ ] feat-002 — gates.mjs: parser, --lint, --status + tests
+- [ ] feat-003 — gates.mjs: --run, --reverify, evidence + digests + tests
+- [ ] feat-004 — wire the ledger into the gate (task format, scope table, closeout, folder map)
+- [ ] feat-005 — assumption checklist + blinding lists in subagent-delegation.md
 
 ## Backlog
 
@@ -66,4 +69,4 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 ---
 
-*Last updated: [YYYY-MM-DD]*
+*Last updated: 2026-09-23*
