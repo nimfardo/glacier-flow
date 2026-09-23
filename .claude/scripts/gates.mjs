@@ -8,10 +8,13 @@
 // Node 18+, no dependencies. ASCII, LF. Runs the same on macOS, Linux and Windows -- a gate that
 // no-ops on one machine is worse than no gate, because you stop checking.
 //
-//   node .claude/scripts/gates.mjs --lint    gates/<id>.md [--strict]
-//   node .claude/scripts/gates.mjs --status  gates/<id>.md
+//   node .claude/scripts/gates.mjs --lint     gates/<id>.md [--strict]
+//   node .claude/scripts/gates.mjs --run      gates/<id>.md [--timeout N]
+//   node .claude/scripts/gates.mjs --reverify gates/<id>.md [--timeout N]
+//   node .claude/scripts/gates.mjs --status   gates/<id>.md
 
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { spawn } from 'node:child_process'
 import { basename } from 'node:path'
 import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
@@ -170,8 +173,6 @@ export function lintLedger(ledger, file, { strict = false } = {}) {
   return findings
 }
 
-// ---------------------------------------------------------------- cli
-
 export function loadLedger(file) {
   if (!existsSync(file)) {
     process.stderr.write(`gates: no ledger at ${file}\n`)
@@ -179,6 +180,99 @@ export function loadLedger(file) {
   }
   return parseLedger(readFileSync(file, 'utf8'))
 }
+
+// ---------------------------------------------------------------- run
+
+export const MAX_OUTPUT_BYTES = 1024 * 1024
+const DEFAULT_TIMEOUT_SECONDS = 120
+
+// Kill the whole process tree, not just the shell we spawned: a CHECK is usually a shell invoking a
+// test runner, and killing the shell alone leaves the runner holding the build directory.
+function killTree(child) {
+  if (process.platform === 'win32') {
+    try { spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' }) } catch { /* already gone */ }
+    return
+  }
+  try { process.kill(-child.pid, 'SIGKILL') } catch { try { child.kill('SIGKILL') } catch { /* already gone */ } }
+}
+
+export function runCheck(command, timeoutSeconds = DEFAULT_TIMEOUT_SECONDS) {
+  return new Promise((resolve) => {
+    const child = spawn(command, {
+      shell: true,
+      detached: process.platform !== 'win32',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    })
+    let out = ''
+    let bytes = 0
+    let verdict = null // 'timeout' | 'overflow'
+
+    const collect = (chunk) => {
+      bytes += chunk.length
+      if (bytes > MAX_OUTPUT_BYTES) {
+        if (!verdict) { verdict = 'overflow'; killTree(child) }
+        return
+      }
+      out += chunk
+    }
+    child.stdout.on('data', collect)
+    child.stderr.on('data', collect)
+
+    const timer = setTimeout(() => { if (!verdict) { verdict = 'timeout'; killTree(child) } }, timeoutSeconds * 1000)
+
+    child.on('error', (e) => { clearTimeout(timer); resolve({ exit: 'error', out: String(e.message) }) })
+    child.on('close', (code) => {
+      clearTimeout(timer)
+      if (verdict) return resolve({ exit: verdict, out })
+      resolve({ exit: String(code ?? 'null'), out })
+    })
+  })
+}
+
+const firstLine = (s) => (s.split(/\r?\n/).find((l) => l.trim() !== '') ?? '').slice(0, 160).replace(/"/g, "'")
+
+export function evidenceFor(gate, result) {
+  const stamp = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')
+  const matched = result.exit === '0' && new RegExp(gate.expect, 'm').test(result.out)
+  const head = matched ? 'met' : 'unmet'
+  const digest = matched ? ` digest=${digestOf(gate)}` : ''
+  return { matched, line: `EVIDENCE: ${head} ${stamp} exit=${result.exit}${digest} out="${firstLine(result.out)}"` }
+}
+
+// Rewrite from the bottom up so earlier line numbers stay valid.
+function applyEvidence(file, updates) {
+  const lines = readFileSync(file, 'utf8').split('\n')
+  for (const u of [...updates].sort((a, b) => b.anchor - a.anchor)) {
+    if (u.replaceAt) lines[u.replaceAt - 1] = u.line
+    else lines.splice(u.anchor, 0, u.line)
+  }
+  writeFileSync(file, lines.join('\n'))
+}
+
+export async function runLedger(file, { all = false, timeoutSeconds = DEFAULT_TIMEOUT_SECONDS } = {}) {
+  const ledger = loadLedger(file)
+  const abandoned = new Set(ledger.abandons.map((a) => a.id))
+  const updates = []
+
+  for (const gate of ledger.gates) {
+    if (isManual(gate) || abandoned.has(gate.id)) continue          // never executed, only owed
+    if (gate.expect === null) continue                              // the linter's job, not ours
+    if (!all && statusOf(ledger, gate).state === 'met') continue    // --run re-executes only the unmet
+
+    const result = await runCheck(gate.check, timeoutSeconds)
+    const { line } = evidenceFor(gate, result)
+    updates.push({
+      line,
+      replaceAt: gate.lines.evidence ?? null,
+      anchor: gate.lines.evidence ?? Math.max(gate.lines.check ?? gate.line, gate.lines.expect ?? gate.line),
+    })
+  }
+
+  if (updates.length) applyEvidence(file, updates)
+  return updates.length
+}
+
+// ---------------------------------------------------------------- cli
 
 function cmdLint(file, strict) {
   const findings = lintLedger(loadLedger(file), file, { strict })
@@ -199,18 +293,22 @@ export function printStatus(file, ledger) {
   return clean
 }
 
-function cmdStatus(file) {
-  process.exit(printStatus(file, loadLedger(file)) ? 0 : 1)
-}
-
-const USAGE = `usage: gates.mjs --lint|--status <ledger.md> [--strict]\n`
+const USAGE = `usage: gates.mjs --lint|--run|--reverify|--status <ledger.md> [--strict] [--timeout N]\n`
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const argv = process.argv.slice(2)
   const flags = new Set(argv.filter((a) => a.startsWith('--')))
-  const file = argv.find((a) => !a.startsWith('--'))
+  const positional = argv.filter((a) => !a.startsWith('--'))
+  const tIndex = argv.indexOf('--timeout')
+  const timeoutSeconds = tIndex === -1 ? DEFAULT_TIMEOUT_SECONDS : Number(argv[tIndex + 1])
+  const file = positional.find((a) => a !== String(timeoutSeconds))
+
   if (!file) { process.stderr.write(USAGE); process.exit(2) }
+
   if (flags.has('--lint')) cmdLint(file, flags.has('--strict'))
-  else if (flags.has('--status')) cmdStatus(file)
-  else { process.stderr.write(USAGE); process.exit(2) }
+  else if (flags.has('--status')) process.exit(printStatus(file, loadLedger(file)) ? 0 : 1)
+  else if (flags.has('--run') || flags.has('--reverify')) {
+    await runLedger(file, { all: flags.has('--reverify'), timeoutSeconds })
+    process.exit(printStatus(file, loadLedger(file)) ? 0 : 1)
+  } else { process.stderr.write(USAGE); process.exit(2) }
 }

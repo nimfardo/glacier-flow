@@ -5,10 +5,11 @@
 //   node .claude/scripts/tests/gates.test.mjs
 
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { parseLedger, lintLedger, statusOf, summarize, digestOf } from '../gates.mjs'
+import { parseLedger, lintLedger, statusOf, summarize, digestOf, runLedger, loadLedger } from '../gates.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const FIX = join(here, 'fixtures', 'gates')
@@ -16,7 +17,11 @@ const GATES = join(here, '..', 'gates.mjs')
 
 let run = 0
 const failures = []
-const test = (name, fn) => { run++; try { fn() } catch (e) { failures.push(`${name}: ${e.message}`) } }
+const pending = []
+const test = (name, fn) => {
+  run++
+  pending.push(Promise.resolve().then(fn).catch((e) => { failures.push(`${name}: ${e.message}`) }))
+}
 const eq = (got, want, msg = '') => {
   if (got !== want) throw new Error(`${msg} expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`)
 }
@@ -179,8 +184,94 @@ test('a missing ledger exits 2 rather than passing silently', () => {
   eq(cli(['--status', join(FIX, 'nope', 'feat-999.md')]).code, 2)
 })
 
+
+// ---------------------------------------------------------------- run
+
+const NODE = JSON.stringify(process.execPath)
+// A ledger written to a temp dir, so a run never mutates a fixture.
+const scratch = (name, body) => {
+  const dir = mkdtempSync(join(tmpdir(), 'gates-'))
+  const file = join(dir, name)
+  writeFileSync(file, body)
+  return file
+}
+const gate = (id, title, check, expect) => `## ${id} — ${title}\nCHECK: ${check}\nEXPECT: ${expect}\n`
+const PASSES = `${NODE} -e "console.log('gates parsed')"`
+const FAILS = `${NODE} -e "console.log('nope'); process.exit(3)"`
+
+test('--run writes a met EVIDENCE line and --status then reports met', async () => {
+  const f = scratch('feat-920.md', `# Gates — feat-920\n\n${gate('G1', 'parser reads a one-gate ledger', PASSES, '^gates parsed$')}`)
+  await runLedger(f)
+  const text = readFileSync(f, 'utf8')
+  ok(/^EVIDENCE: met \S+ exit=0 digest=[0-9a-f]{8} out="gates parsed"$/m.test(text), `evidence line not written: ${text}`)
+  eq(summarize(loadLedger(f)).clean, true, 'status after a passing run:')
+})
+
+test('editing EXPECT on a met gate flips it to unmet without a re-run', async () => {
+  const f = scratch('feat-921.md', `# Gates — feat-921\n\n${gate('G1', 'parser reads a one-gate ledger', PASSES, '^gates parsed$')}`)
+  await runLedger(f)
+  eq(summarize(loadLedger(f)).clean, true, 'met before the edit:')
+  writeFileSync(f, readFileSync(f, 'utf8').replace('EXPECT: ^gates parsed$', 'EXPECT: ^.*$'))
+  const s = statusOf(loadLedger(f), loadLedger(f).gates[0])
+  eq(s.state, 'unmet', 'after editing EXPECT:')
+  ok(/digest mismatch/.test(s.why), `expected a digest mismatch, got ${s.why}`)
+})
+
+test('a failing CHECK is recorded unmet, with no digest to reuse', async () => {
+  const f = scratch('feat-922.md', `# Gates — feat-922\n\n${gate('G1', 'export writes BOM-free UTF-8', FAILS, '^gates parsed$')}`)
+  await runLedger(f)
+  const text = readFileSync(f, 'utf8')
+  ok(/^EVIDENCE: unmet \S+ exit=3 out=/m.test(text), `expected an unmet evidence line, got: ${text}`)
+  ok(!/digest=/.test(text), 'a failed gate must not carry a digest')
+  eq(summarize(loadLedger(f)).clean, false)
+})
+
+test('a CHECK past the timeout is killed and recorded exit=timeout, never met', async () => {
+  const slow = `${NODE} -e "setTimeout(() => {}, 20000)"`
+  const f = scratch('feat-923.md', `# Gates — feat-923\n\n${gate('G1', 'export finishes inside its budget', slow, '^gates parsed$')}`)
+  await runLedger(f, { timeoutSeconds: 1 })
+  ok(/exit=timeout/.test(readFileSync(f, 'utf8')), 'expected exit=timeout in the evidence line')
+  eq(summarize(loadLedger(f)).clean, false)
+})
+
+test('output over the cap is unmet as overflow, never truncated into a pass', async () => {
+  const loud = `${NODE} -e "console.log('x'.repeat(1200 * 1024)); console.log('gates parsed')"`
+  const f = scratch('feat-924.md', `# Gates — feat-924\n\n${gate('G1', 'export prints a summary line', loud, '^gates parsed$')}`)
+  await runLedger(f, { timeoutSeconds: 30 })
+  ok(/exit=overflow/.test(readFileSync(f, 'utf8')), 'expected exit=overflow in the evidence line')
+  eq(summarize(loadLedger(f)).clean, false, 'a gate whose output overflowed must not read as met:')
+})
+
+test('--run never executes an abandoned gate and the ledger stays unclean', async () => {
+  const f = scratch('feat-925.md', `# Gates — feat-925\n\n${gate('G1', 'parser reads a two-gate ledger', PASSES, '^gates parsed$')}\n## G2 — staging serves the new asset\nCHECK: ${FAILS}\nEXPECT: ^gates parsed$\nABANDON: G2 needs a staging deploy the owner controls\n`)
+  await runLedger(f)
+  const text = readFileSync(f, 'utf8')
+  eq((text.match(/EVIDENCE:/g) ?? []).length, 1, 'only the runnable gate gets evidence:')
+  eq(summarize(loadLedger(f)).clean, false, 'an abandoned gate is a handoff, not a pass:')
+})
+
+test('--run skips a gate already met; --reverify re-executes it and demotes a failure', async () => {
+  const f = scratch('feat-926.md', `# Gates — feat-926\n\n${gate('G1', 'parser reads a one-gate ledger', PASSES, '^gates parsed$')}`)
+  await runLedger(f)
+  const stamp = /EVIDENCE: met (\S+)/.exec(readFileSync(f, 'utf8'))[1]
+
+  eq(await runLedger(f), 0, '--run must skip a gate already met:')
+  eq(/EVIDENCE: met (\S+)/.exec(readFileSync(f, 'utf8'))[1], stamp, 'the evidence line is untouched:')
+
+  writeFileSync(f, readFileSync(f, 'utf8').replace(`CHECK: ${PASSES}`, `CHECK: ${FAILS}`))
+  await runLedger(f, { all: true })
+  eq(summarize(loadLedger(f)).clean, false, '--reverify must demote a gate whose command now fails:')
+})
+
+test('--run leaves a manual gate owed rather than executing it', async () => {
+  const f = scratch('feat-927.md', '# Gates — feat-927\n\n## G1 — owner confirms the hover state\nMANUAL: hover every row and compare against the frame\nEVIDENCE: owed\n')
+  eq(await runLedger(f), 0, 'nothing to execute:')
+  eq(readFileSync(f, 'utf8').includes('EVIDENCE: owed'), true, 'the owed line is untouched:')
+})
+
 // ---------------------------------------------------------------- report
 
+await Promise.all(pending)
 console.log(`${run} run, ${run - failures.length} passed`)
 if (failures.length) {
   for (const f of failures) console.error(`FAIL ${f}`)
