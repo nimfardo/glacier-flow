@@ -15,6 +15,30 @@
 
 <!-- new entries go below this line -->
 
+## [2026-09-23] feat | gate ledger: verification becomes evidence
+
+feat-001..005. Ported the gate-ledger idea from dragon-ice-flow (upstream `771492b`), rewritten in
+Node rather than PowerShell so it runs identically on every platform — the same reason `gate-check.mjs`
+is Node. `gates/<task-id>.md` holds CHECK/EXPECT/EVIDENCE per gate; an EVIDENCE line carries the digest
+of the CHECK+EXPECT it ran against, so editing either half of a met gate flips it to unmet with no
+re-run. Nine linter rules refuse gates that cannot fail. 33 tests, no dependencies.
+
+Also closed a gap that predates the port: `<assumptions>` in the XML task had no consumer. The verifier
+now resolves every line as holds / violated / not code-verifiable, and a violated assumption routes to
+the user rather than being repaired in place.
+
+## [2026-09-23] decision | ledger threshold and where evidence lives
+
+**Decided:** a ledger is required at "2+ gates or any manual gate"; below that the one-line `<verify>`
+command stands. At close, EVIDENCE lines are pasted into the task's `wiki/log.md` entry and the ledger
+is deleted.
+**Contradicts:** nothing — `<verify>` previously had no threshold and no record of having run.
+**Option:** spec-update
+**Propagated:** `.context/gates-ledger.md`, `.context/task-workflow.md`, `.context/task-workflow-appendix.md`, `CLAUDE.md`, `gates/README.md`
+
+Rejected: ledger-always (ceremony on one-line tasks is what makes people skip gates) and
+ledger-optional (an optional gate is skipped exactly when the task is risky).
+
 ## [2026-08-28] decision | push directly to main — one-off exception
 
 **Decided:** "option 2, exception this time"

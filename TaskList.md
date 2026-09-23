@@ -38,22 +38,19 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Active work. Should usually have exactly 1 item. More than 2 = drift.*
 
-- [ ] feat-001 — gate ledger format doc (`.context/gates-ledger.md`) *(started: 2026-09-23)*
 
 ## Ready
 
 *Approved XML tasks, not yet started. Pick from the top.*
 
-- [ ] feat-002 — gates.mjs: parser, --lint, --status + tests
-- [ ] feat-003 — gates.mjs: --run, --reverify, evidence + digests + tests
-- [ ] feat-004 — wire the ledger into the gate (task format, scope table, closeout, folder map)
-- [ ] feat-005 — assumption checklist + blinding lists in subagent-delegation.md
 
 ## Backlog
 
 *Ideas and unblocked work that hasn't been written as an XML task yet. Promote to Ready by writing the XML task and getting user approval.*
 
-- [ ] [rough description]
+- [ ] trim CLAUDE.md + .context/task-workflow.md, or re-base the token budgets in housekeeping.md — both always-load files are over their stated hard limits
+- [ ] plan #2 (records): reference/adr/, STATE NEXT ACTION, monthly wiki/log archive, grep-only history rule
+- [ ] plan #3 (enforcement): budget-check.mjs, .gitattributes LF pin, SETUP.md with hook smoke tests
 
 ## Blocked
 
@@ -65,7 +62,11 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Most recent at top. Trim to last ~20; older ones are findable via `wiki/log.md` + git history.*
 
-- [x] [task-id] — [one-line goal] — `<commit-sha>` *(YYYY-MM-DD)*
+- [x] feat-005 — assumption checklist + blinding lists in subagent-delegation.md — `32b8575` *(2026-09-23)*
+- [x] feat-004 — wire the ledger into the gate (task format, scope table, closeout) — `005fb15` *(2026-09-23)*
+- [x] feat-003 — gates.mjs: --run, --reverify, evidence, timeout, overflow — `eab5370` *(2026-09-23)*
+- [x] feat-002 — gates.mjs: parser, --lint, --status + 25 tests — `cf2d66a` *(2026-09-23)*
+- [x] feat-001 — gate ledger format doc (`.context/gates-ledger.md`) — `3740187` *(2026-09-23)*
 
 ---
 
