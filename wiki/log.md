@@ -15,6 +15,19 @@
 
 <!-- new entries go below this line -->
 
+## [2026-09-23] docs | README caught up with the ledger
+
+docs-001. Seventh divergence recorded (verification as a ledger of evidence), sync marker moved
+`a54b585` → `771492b`, and what was deliberately *not* ported written down beside it — the ten-file
+pipeline and unslop-as-a-hook — so the next sync does not re-litigate those.
+
+Folder map now matches the repo: `gates/`, `.claude/` (hooks, scripts, tests), `SETUP.md`,
+`.gitattributes`, `gates-ledger.md`. Principle 9's gate scope corrected to include `.claude/`,
+`CLAUDE.md` and `CONTEXT.md`. Every path in the map was checked to exist rather than assumed.
+
+Finding: `README.md` and `SETUP.md` sit in no row of the gate table — neither gated nor exempt. Same
+hole `.claude/` was in before ref-002. Backlogged rather than widened mid-task.
+
 ## [2026-09-23] feat | the gate is now testable, budgeted and documented
 
 ref-004, feat-006..009. The hook that enforces every write had no tests while the ledger runner that
