@@ -63,6 +63,12 @@ mutation is already a CHECK/EXPECT pair, just written informally.
 | `node .claude/scripts/gates.mjs --reverify gates/<id>.md` | Runs **every** runnable gate, met or not, and demotes failures | same |
 | `node .claude/scripts/gates.mjs --status gates/<id>.md` | Recomputes from the file alone, no execution | No gate unmet and nothing abandoned |
 
+`--strict` on `--status`, `--run` or `--reverify` makes an **owed** gate blocking. The default is
+tracked-not-failed: closeout names owed gates in the log entry, so an unsigned manual gate does not
+hold the whole ledger red while the runnable gates are green. Use `--strict` where the owner's eyes
+are the point of the gate — a design task's hover, empty, error or loading state closes on the owner's
+signature, not on a green lane.
+
 `--timeout N` (default 120) bounds each CHECK. A CHECK past it is killed and recorded `exit=timeout`,
 unmet. Output over 1 MiB is unmet as overflow, never truncated into a pass — make the CHECK print
 less (a summary line, a tail).

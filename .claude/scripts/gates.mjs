@@ -92,7 +92,10 @@ export function statusOf(ledger, gate) {
   return { state: 'met' }
 }
 
-export function summarize(ledger) {
+// `strict` makes an owed gate blocking. Default is tracked-not-failed: closeout names owed gates in
+// the log entry, so they survive without holding the whole ledger red. A surface where an owner's
+// eyes are the point -- a design task's hover or empty state -- wants --strict.
+export function summarize(ledger, { strict = false } = {}) {
   const counts = { met: 0, unmet: 0, owed: 0, abandoned: 0 }
   const rows = ledger.gates.map((g) => {
     const s = statusOf(ledger, g)
@@ -102,7 +105,8 @@ export function summarize(ledger) {
     else counts.owed++
     return { gate: g, ...s }
   })
-  return { rows, counts, clean: counts.unmet === 0 && counts.abandoned === 0 }
+  const clean = counts.unmet === 0 && counts.abandoned === 0 && (!strict || counts.owed === 0)
+  return { rows, counts, clean }
 }
 
 // ---------------------------------------------------------------- lint
@@ -286,8 +290,8 @@ function cmdLint(file, strict) {
   process.exit(hard === 0 ? 0 : 1)
 }
 
-export function printStatus(file, ledger) {
-  const { rows, counts, clean } = summarize(ledger)
+export function printStatus(file, ledger, { strict = false } = {}) {
+  const { rows, counts, clean } = summarize(ledger, { strict })
   for (const r of rows) {
     process.stdout.write(`  ${r.gate.id.padEnd(4)} ${r.state}${r.why ? ` (${r.why})` : ''}  ${r.gate.title}\n`)
   }
@@ -308,9 +312,9 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   if (!file) { process.stderr.write(USAGE); process.exit(2) }
 
   if (flags.has('--lint')) cmdLint(file, flags.has('--strict'))
-  else if (flags.has('--status')) process.exit(printStatus(file, loadLedger(file)) ? 0 : 1)
+  else if (flags.has('--status')) process.exit(printStatus(file, loadLedger(file), { strict: flags.has('--strict') }) ? 0 : 1)
   else if (flags.has('--run') || flags.has('--reverify')) {
     await runLedger(file, { all: flags.has('--reverify'), timeoutSeconds })
-    process.exit(printStatus(file, loadLedger(file)) ? 0 : 1)
+    process.exit(printStatus(file, loadLedger(file), { strict: flags.has('--strict') }) ? 0 : 1)
   } else { process.stderr.write(USAGE); process.exit(2) }
 }

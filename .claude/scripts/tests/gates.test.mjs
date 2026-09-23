@@ -188,6 +188,12 @@ test('--status reports an owed manual gate but still exits 0 (it is tracked, not
   ok(/owed/.test(r.out), `expected owed in the status output, got ${r.out}`)
 })
 
+test('--status --strict makes an owed manual gate blocking', () => {
+  const f = join(FIX, 'manual', 'feat-906.md')
+  eq(cli(['--status', f]).code, 0, 'default is tracked, not failed:')
+  eq(cli(['--status', f, '--strict']).code, 1, 'strict:')
+})
+
 test('--status exits 1 on an abandoned gate', () => {
   eq(cli(['--status', join(FIX, 'abandon', 'feat-908.md')]).code, 1)
 })
