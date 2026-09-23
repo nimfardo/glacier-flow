@@ -22,7 +22,46 @@ Planning is never delegated away from the main context: the approval gate faces 
 
 **Implementer** receives the full XML task verbatim, touches only files listed in `<write>`, and returns a diff summary.
 **Verifier** follows the after-task checklist in `task-workflow.md` → Core Rules. One task = one commit.
+Where the task carries a ledger, it runs `node .claude/scripts/gates.mjs --reverify gates/<id>.md` — the
+task's single re-execution. Nobody runs the lanes after it, and a pass that did not re-verify has not
+verified. It returns the assumption checklist below as a required output.
 **Housekeeper** runs the sequence in `.context/housekeeping.md`. Still proposal-only: findings come back for user approval, never autonomous cleanup.
+
+## Blinding
+
+Each role has a **Never open** list. The reason is narrow and worth stating plainly: two roles that
+both read everything are one reviewer running twice, not two reviewers. A verifier that has read the
+implementer's reasoning ends up checking that the reasoning was followed — the one thing already
+guaranteed to be true.
+
+| Role | Reads | Never opens |
+|---|---|---|
+| Implementer | The XML task verbatim, the files in `<read>` / `<write>`, the ledger | The verifier's report from an earlier round |
+| Verifier | The XML task, the diff, the ledger, the `<assumptions>` list | The implementer's reasoning or working notes — the diff is the claim, not the story behind it |
+
+Blinding is by *file*, not by instruction. A role that has to be told not to think about something it
+has already read was blinded too late.
+
+## Assumption Checklist
+
+`<assumptions>` in the XML task is not decoration — it is the verifier's checklist, and a verify
+result without it is not a verify result.
+
+Every line comes back resolved as exactly one of:
+
+- `✓` holds — with `file:line` evidence opened this round
+- `✗` violated — with the evidence that shows it
+- `n/a` not code-verifiable (design intent, future scope) — one line of reasoning, and no invented citation
+
+An output missing a row is rejected and the verify re-run. A `✗` is **not** a code defect the verifier
+quietly repairs: a violated assumption means the task was planned against a codebase that turned out
+not to exist, so it stops and goes back to the user.
+
+Where the evidence shows the *record* is stale rather than the code wrong — an outdated comment, a
+superseded line in `reference/`, a spec that no longer matches — mark it `✗ record-error suspected`.
+Same routing, but pre-triaged: that fix belongs in the record, at its source, in the same closeout.
+This is the contradiction discipline of `.context/rules.md` non-negotiable 6 reaching verification;
+that rule governs, this is only where it surfaces.
 
 ## Cost Gate
 
@@ -43,6 +82,10 @@ Default posture: cheapest tier that can do the job, escalate on request. Not: be
 4. Main agent closes the sentinel and reviews the result before starting the next task.
 
 A failed `<verify>` goes back to step 2 — fix before the next task, per Core Rules.
+
+**Two implement attempts, then stop and ask.** A third round on the same task means the task is wrong,
+not the implementation. Every loop needs a floor, and where no retry budget covers a situation, the
+floor is the user.
 
 ## End of Plan
 
