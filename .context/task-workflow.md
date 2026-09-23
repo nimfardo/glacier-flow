@@ -14,7 +14,8 @@ The gate fires whether the conversation has been plain or structured. If the con
 
 | Surface | Gate | Defined in |
 |---|---|---|
-| `src/`, `reference/`, `.context/` | `<task>` / `<plan>` | this file |
+| `src/`, `reference/`, `.context/`, `.claude/` | `<task>` / `<plan>` | this file |
+| `CLAUDE.md`, `CONTEXT.md` | `<task>` / `<plan>` | this file |
 | Figma files (mutations via MCP/plugin tools) | `<task>` / `<plan>` | this file + `workspaces/design-authoring/CONTEXT.md` |
 | `planning/` | `<planning-task>` | `workspaces/planning/CONTEXT.md` |
 | `wiki/` (multi-page: ingest, lint fixes) | `<ingest>` | `workspaces/research/CONTEXT.md` |
@@ -75,12 +76,17 @@ Multi-task:
 
 ## Enforcement (hook)
 
-The code gate is enforced mechanically by a PreToolUse hook (`.claude/hooks/gate-check.mjs`, registered in `.claude/settings.json`): `Edit`/`Write` to `src/`, `reference/`, or `.context/` is blocked unless the sentinel file `.claude/gate-open` exists. The hook runs on Node so it behaves identically on macOS, Linux, and Windows.
+The code gate is enforced mechanically by a PreToolUse hook (`.claude/hooks/gate-check.mjs`, registered in `.claude/settings.json`): `Edit`/`Write` to a gated surface is blocked unless the sentinel file `.claude/gate-open` exists. The hook runs on Node so it behaves identically on macOS, Linux, and Windows.
 
 Sentinel lifecycle:
 1. User approves the XML task → create the sentinel: `echo approved > .claude/gate-open`
 2. Execute the task, verify, commit.
 3. Delete the sentinel: `rm .claude/gate-open` (`Remove-Item` on PowerShell). Never leave it open between tasks.
+
+`.claude/` is gated because the hook, the ledger runner and the settings that register them *are* the
+enforcement — a gate that cannot protect its own implementation is a convention, not a gate. The
+sentinel is created with a shell redirect rather than `Edit`/`Write`, so opening the gate is never
+blocked by the gate.
 
 The sentinel is gitignored. If the hook blocks a write you believe is exempt, check the "Which Gate Covers What" table — bookkeeping files are outside the gated paths by design.
 
