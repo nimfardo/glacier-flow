@@ -15,6 +15,39 @@
 
 <!-- new entries go below this line -->
 
+## [2026-09-23] feat | the gate is now testable, budgeted and documented
+
+ref-004, feat-006..009. The hook that enforces every write had no tests while the ledger runner that
+only reports had 36. `gate-check.test.mjs` is now the executable form of the "Which Gate Covers What"
+table — one assertion per row — and it asserts fail-open as a deliberate property rather than leaving
+it indistinguishable from a bug.
+
+`budget-check.mjs` replaces unenforceable token targets with byte limits for the four always-load
+files; the numbers live in the script and `housekeeping.md` points at them. `.gitattributes` pins LF
+and a zero-CR gate makes the standard-gates table non-vacuous for the first time. `SETUP.md` is
+canonical for setup with the gate verification as step 1.
+
+Three tasks were verified through ledgers — the first real use of feat-001..005.
+
+```
+feat-007  G1 met 2026-09-23T07:35:00Z exit=0 digest=3b5f807a out="11 run, 11 passed"
+feat-007  G2 met 2026-09-23T07:35:00Z exit=0 digest=fc1a658b out="budget-check: ok (4 file(s))"
+feat-007  G3 met 2026-09-23T07:35:00Z exit=0 digest=d6cc9fb7 out="registered"
+feat-008  G1 met 2026-09-23T07:35:51Z exit=0 digest=3fa1853e out="scanned"
+feat-008  G2 met 2026-09-23T07:35:51Z exit=0 digest=f27e1086 out="CLAUDE.md: eol: lf"
+feat-009  G1 met 2026-09-23T07:36:41Z exit=0 digest=abc0b415 out="11 run, 11 passed"
+feat-009  G2 met 2026-09-23T07:36:41Z exit=0 digest=cdad3227 out="pointer only"
+feat-009  G3 owed — MANUAL: owner runs SETUP.md against a fresh clone
+```
+
+**Owed:** feat-009 G3. Only the owner can run the template against a fresh clone; until then the
+board row carries `gate-owed? yes`.
+
+**Plan deviation:** feat-007's G2 was planned as "an over-budget fixture is refused". A CHECK must
+exit 0 to be met, so proving a refusal needs a wrapper that inverts the exit code and is not portable
+across shells. The refusal is asserted in the test suite instead, and G2 became "every budgeted file
+is within its limit". Same coverage, one fewer unportable command.
+
 ## [2026-09-23] fix | the linter refused the pattern its own doc recommends
 
 bug-001. `^(\d+) run, \1 passed$` is the self-consistent EXPECT `.context/gates-ledger.md` tells you to
