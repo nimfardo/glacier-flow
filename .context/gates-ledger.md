@@ -115,8 +115,13 @@ A project fills these from its own stack, and a task's specific gates follow the
 | unit lane | _project: test command_ | `(\d+) run, \1 passed`, or the lane's own self-consistent line |
 | lint / typecheck | _project: lint command_ | the tool's clean line |
 | format | _project: format check_ | the tool's clean line |
+| zero CR | `node -e "const{execSync}=require('child_process');const fs=require('fs');const bad=execSync('git ls-files -z').toString().split('\0').filter(Boolean).filter(f=>{try{return fs.readFileSync(f).includes(13)}catch{return false}});console.log(bad.length?'CR: '+bad.join(' '):'scanned')"` | `^scanned$` |
 
-On this template all three are empty, because `src/` is empty and there is no lane to point at. That
-is the honest state rather than an omission: a gate pointing at a command that does not exist passes
-vacuously, which is worse than having no gate, because it looks like coverage. Fill them when the
-project picks a stack and record the choice in `STATE.md` → Stack & Versions.
+Zero CR needs no stack — `.gitattributes` pins LF, and this gate catches a file that slipped in
+before the pin or through a tool that ignores it. It is the one standard gate that is real on a
+template with an empty `src/`.
+
+The other three stay empty until a project picks a stack, and that is the honest state rather than an
+omission: a gate pointing at a command that does not exist passes vacuously, which is worse than
+having no gate, because it looks like coverage. Fill them and record the choice in `STATE.md` →
+Stack & Versions.
