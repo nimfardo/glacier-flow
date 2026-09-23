@@ -109,13 +109,18 @@ For an active project at month 6:
 | `STATE.md` | ~300 | 500 |
 | `TaskList.md` | ~400 (most in Done) | 700 |
 | `.context/rules.md` | ~500 (filled in) | 800 |
-| `.context/task-workflow.md` | ~480 (incl. gate table) | 600 |
-| **Always-load total** | **~3,500** | **5,000** |
+| `.context/task-workflow.md` | ~900 (gate table, Closeout, ledger threshold) | 1,200 |
+| **Always-load total** | **~4,000** | **5,500** |
 | Workspace files | 300–1400 each | 1500 |
 | `wiki/index.md` | ~600 (~50 entries) | 1200 |
 | Planning indexes (each) | ~200 | 500 |
 
-If you blow a hard limit, that's the trigger for a housekeep pass whether or not it's "scheduled."
+`.context/task-workflow.md`'s limit was re-based from 600 on 2026-09-23. It holds the canonical gate
+table and the ledger threshold; under the One-Place Rule that content cannot move elsewhere, so the
+budget was wrong rather than the file. Trim the other always-load files first — re-basing a limit is a
+decision that needs a reason, not a way to make a number go green.
+
+If you blow a hard limit, that's the trigger for a housekeep pass whether or not it's "scheduled." 
 
 ## When NOT to Housekeep
 
