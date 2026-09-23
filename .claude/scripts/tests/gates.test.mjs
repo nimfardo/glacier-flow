@@ -10,22 +10,11 @@ import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseLedger, lintLedger, statusOf, summarize, digestOf, runLedger, loadLedger } from '../gates.mjs'
+import { test, eq, ok, report } from './harness.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const FIX = join(here, 'fixtures', 'gates')
 const GATES = join(here, '..', 'gates.mjs')
-
-let run = 0
-const failures = []
-const pending = []
-const test = (name, fn) => {
-  run++
-  pending.push(Promise.resolve().then(fn).catch((e) => { failures.push(`${name}: ${e.message}`) }))
-}
-const eq = (got, want, msg = '') => {
-  if (got !== want) throw new Error(`${msg} expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`)
-}
-const ok = (cond, msg) => { if (!cond) throw new Error(msg) }
 
 const load = (dir, name) => {
   const file = join(FIX, dir, name)
@@ -293,9 +282,4 @@ test('--run leaves a manual gate owed rather than executing it', async () => {
 
 // ---------------------------------------------------------------- report
 
-await Promise.all(pending)
-console.log(`${run} run, ${run - failures.length} passed`)
-if (failures.length) {
-  for (const f of failures) console.error(`FAIL ${f}`)
-  process.exit(1)
-}
+await report()
