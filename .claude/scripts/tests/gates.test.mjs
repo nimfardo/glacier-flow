@@ -101,6 +101,22 @@ test('pinned count refuses a literal count', () => {
   ok(rules('bad-count', 'feat-903.md').includes('pinned count'), 'expected a pinned count finding')
 })
 
+test('pinned count does not fire on a regex backreference', () => {
+  // The canonical self-consistent EXPECT from .context/gates-ledger.md. `\\1 passed` is a
+  // backreference, not a hard-coded count -- reading it as one would fail every correct test lane.
+  const ledger = parseLedger([
+    '## G1 — the suite passes on this box',
+    'CHECK: node test.mjs',
+    'EXPECT: ^(\\d+) run, \\1 passed$',
+  ].join('\n'))
+  const found = lintLedger(ledger, 'feat-930.md').map((f) => f.rule)
+  eq(found.includes('pinned count'), false, `canonical EXPECT must lint clean, got ${JSON.stringify(found)}`)
+})
+
+test('pinned count still fires on a literal count', () => {
+  ok(rules('bad-count', 'feat-903.md').includes('pinned count'), 'expected a pinned count finding')
+})
+
 test('tautological refuses a CHECK that only prints its own EXPECT', () => {
   ok(rules('bad-tautology', 'feat-911.md').includes('tautological'), 'expected a tautological finding')
 })

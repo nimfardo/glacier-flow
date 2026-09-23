@@ -108,7 +108,9 @@ export function summarize(ledger) {
 // ---------------------------------------------------------------- lint
 
 const BARE_SUCCESS = new Set(['ok', 'true', 'passed', 'pass', 'done', 'success', 'succeeded', 'yes', '0', '1'])
-const PINNED_COUNT = /\b\d+\s+(passed|failed|run|tests?|failures?)\b/i
+// A backreference (\1) is not a count: the canonical self-consistent EXPECT `^(\d+) run, \1 passed$`
+// must not trip this rule. Only a digit that is not preceded by a backslash is a literal count.
+const PINNED_COUNT = /(?<!\\)\b\d+\s+(passed|failed|run|tests?|failures?)\b/i
 const ACTIVITY = /^(run|check|test|verify|execute|ensure|make sure|try)\b/i
 const ECHO_ONLY = /^(?:echo|printf|Write-Output|Write-Host)\s+(.+)$/i
 
