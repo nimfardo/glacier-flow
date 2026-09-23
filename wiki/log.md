@@ -15,6 +15,27 @@
 
 <!-- new entries go below this line -->
 
+## [2026-09-23] fix | the linter refused the pattern its own doc recommends
+
+bug-001. `^(\d+) run, \1 passed$` is the self-consistent EXPECT `.context/gates-ledger.md` tells you to
+write, and the pinned-count rule read `\1 passed` as a hard-coded count — every correct test-lane gate
+would have failed lint. Found by running the tool against a real ledger rather than only its fixtures;
+36 unit tests were green at the time. The rule was fixed, not the doc.
+
+## [2026-09-23] decision | the gate now covers its own implementation
+
+**Decided:** `.claude/`, `CLAUDE.md` and `CONTEXT.md` join `src/`, `reference/` and `.context/` behind
+the XML task gate. `STATE.md`, `TaskList.md` and `wiki/log.md` stay exempt.
+**Contradicts:** nothing — it closes a hole rather than reversing a rule. `.claude/` was never listed,
+which is how `gates.mjs`, `gate-check.mjs` and `settings.json` were all written this session without a task.
+**Option:** spec-update
+**Propagated:** `.claude/hooks/gate-check.mjs`, `.context/task-workflow.md`
+
+Also decided: an owed manual gate stays non-blocking by default and `--strict` flips it, rather than
+choosing one reading for every project. And `.context/task-workflow.md`'s token budget was re-based
+600 → 1,200 because it holds canonical content that the One-Place Rule forbids moving — the budget was
+wrong, not the file.
+
 ## [2026-09-23] feat | gate ledger: verification becomes evidence
 
 feat-001..005. Ported the gate-ledger idea from dragon-ice-flow (upstream `771492b`), rewritten in

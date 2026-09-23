@@ -48,7 +48,6 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Ideas and unblocked work that hasn't been written as an XML task yet. Promote to Ready by writing the XML task and getting user approval.*
 
-- [ ] trim CLAUDE.md + .context/task-workflow.md, or re-base the token budgets in housekeeping.md — both always-load files are over their stated hard limits
 - [ ] plan #2 (records): reference/adr/, STATE NEXT ACTION, monthly wiki/log archive, grep-only history rule
 - [ ] plan #3 (enforcement): budget-check.mjs, .gitattributes LF pin, SETUP.md with hook smoke tests
 
@@ -62,6 +61,10 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Most recent at top. Trim to last ~20; older ones are findable via `wiki/log.md` + git history.*
 
+- [x] ref-003 — trim CLAUDE.md, re-base the task-workflow token budget — `8a9ce99` *(2026-09-23)*
+- [x] ref-002 — put `.claude/` + always-load root files behind the gate — `8587043` *(2026-09-23)*
+- [x] ref-001 — `--strict` makes an owed gate blocking — `884dd2b` *(2026-09-23)*
+- [x] bug-001 — pinned-count rule read a regex backreference as a count — `acd7da0` *(2026-09-23)*
 - [x] feat-005 — assumption checklist + blinding lists in subagent-delegation.md — `32b8575` *(2026-09-23)*
 - [x] feat-004 — wire the ledger into the gate (task format, scope table, closeout) — `005fb15` *(2026-09-23)*
 - [x] feat-003 — gates.mjs: --run, --reverify, evidence, timeout, overflow — `eab5370` *(2026-09-23)*
