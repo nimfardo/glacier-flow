@@ -50,6 +50,7 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 - [ ] plan #2 (records): reference/adr/, STATE NEXT ACTION — the log archive and grep-only rule are deferred until the log has volume
 - [ ] gates.mjs records the *first* line of output as evidence; the line that matched EXPECT would be better evidence (feat-007 G1 recorded a per-suite count, not the total)
+- [ ] add a standing gate that every commit SHA on the board resolves (`git cat-file -t`) — two were written from memory on 2026-09-23 and only caught by a manual check
 - [ ] dogfood the template on a real project — every gate so far is verified against a repo with an empty src/ and no test lane
 
 ## Blocked
@@ -65,8 +66,8 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 - [x] feat-009 — SETUP.md, gate verification as step 1 — `97cf3b4` — gate-owed? yes *(2026-09-23)*
 - [x] feat-008 — .gitattributes LF pin + zero-CR standard gate — `5e55a48` *(2026-09-23)*
 - [x] feat-007 — budget-check.mjs PostToolUse budget hook — `ce33699` *(2026-09-23)*
-- [x] feat-006 — tests for gate-check.mjs — `5e2ee4a` *(2026-09-23)*
-- [x] ref-004 — shared test harness + run-all runner — `0d4a0e8` *(2026-09-23)*
+- [x] feat-006 — tests for gate-check.mjs — `68d9e33` *(2026-09-23)*
+- [x] ref-004 — shared test harness + run-all runner — `bbd8a4b` *(2026-09-23)*
 - [x] ref-003 — trim CLAUDE.md, re-base the task-workflow token budget — `8a9ce99` *(2026-09-23)*
 - [x] ref-002 — put `.claude/` + always-load root files behind the gate — `8587043` *(2026-09-23)*
 - [x] ref-001 — `--strict` makes an owed gate blocking — `884dd2b` *(2026-09-23)*

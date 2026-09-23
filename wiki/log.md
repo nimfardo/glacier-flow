@@ -43,6 +43,10 @@ feat-009  G3 owed — MANUAL: owner runs SETUP.md against a fresh clone
 **Owed:** feat-009 G3. Only the owner can run the template against a fresh clone; until then the
 board row carries `gate-owed? yes`.
 
+**Record error, fixed at source:** two commit SHAs on the board (`feat-006`, `ref-004`) were written
+from memory rather than read from `git log`, and both were wrong. Caught by resolving every SHA on the
+board with `git cat-file -t`. That check belongs in a gate, not in a habit — it is on the backlog.
+
 **Plan deviation:** feat-007's G2 was planned as "an over-budget fixture is refused". A CHECK must
 exit 0 to be met, so proving a refusal needs a wrapper that inverts the exit code and is not portable
 across shells. The refusal is asserted in the test suite instead, and G2 became "every budgeted file
