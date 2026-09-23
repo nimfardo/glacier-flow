@@ -27,6 +27,7 @@
 - `identity.md` · `rules.md` · `glossary.md`
 - `task-workflow.md` (gate; always-load) · `task-workflow-appendix.md` (on-demand)
 - `subagent-delegation.md` (on-demand; role routing + cost gate for executing approved tasks)
+- `gates-ledger.md` (on-demand; verification ledger format + linter rules)
 - `housekeeping.md` (on-demand)
 
 **`workspaces/`** — task-type contexts: `feature-development/`, `design-to-code/`, `design-authoring/`, `debugging/`, `refactoring/`, `planning/`, `research/`
@@ -34,6 +35,8 @@
 **`skills/`** — on-demand thinking: `brainstorm/`
 
 **`planning/`** — artifacts: `stories/`, `specs/`, `plans/` (each has `index.md`)
+
+**`gates/`** — one verification ledger per task in flight; deleted at close
 
 **`reference/`** — deep docs YOU wrote (loaded on demand)
 
@@ -59,6 +62,7 @@ Every fact lives in exactly one file. Other files point to it; they never copy i
 - Project decisions, project-specific patterns → `reference/`
 - Chosen architecture / folder conventions for `src/` (once decided) → `reference/architecture/`
 - Design tokens, component inventory (once decided) → `reference/design-system.md`
+- Verification format (gates, evidence, linter rules) → `.context/gates-ledger.md`
 - Accumulated knowledge from external sources → `wiki/`
 
 ## Authority Boundary

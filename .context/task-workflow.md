@@ -19,6 +19,7 @@ The gate fires whether the conversation has been plain or structured. If the con
 | `planning/` | `<planning-task>` | `workspaces/planning/CONTEXT.md` |
 | `wiki/` (multi-page: ingest, lint fixes) | `<ingest>` | `workspaces/research/CONTEXT.md` |
 | `wiki/` (single-page query filing) | One-line confirmation | `workspaces/research/CONTEXT.md` |
+| `gates/` | **Covered** by the task whose verification it records — no gate of its own | `.context/gates-ledger.md` |
 | `STATE.md`, `TaskList.md`, `wiki/log.md`, index files | **Exempt** — bookkeeping required by an already-approved task | — |
 
 The exemption covers only the bookkeeping an approved task's checklist demands (board moves, state updates, log appends, index entries). It is not a side door for content changes.
@@ -47,10 +48,14 @@ The `<brainstorm>` wrapper in `skills/brainstorm/SKILL.md` is a declaration, not
     <write>...</write>
   </files>
   <action>Exact instructions, baked-in decisions, what to avoid.</action>
-  <verify>Runnable command that proves the goal.</verify>
+  <verify>Runnable command that proves the goal, or: ledger gates/<id>.md — G1, G2</verify>
   <done>Definition of complete.</done>
 </task>
 ```
+
+`<verify>` takes either form. A single runnable command stands on its own; once a task has **two or
+more gates, or any manual gate**, it becomes a ledger instead — format, lifecycle and linter rules in
+`.context/gates-ledger.md`.
 
 Multi-task:
 ```xml
@@ -66,7 +71,7 @@ Multi-task:
 - One task at a time. Only touch files in `<write>`.
 - No opportunistic refactoring.
 - Failed task → fix before next.
-- After: run `<verify>`, commit (one task = one commit), move to `TaskList.md ## Done`, update `STATE.md` if state changed, append to `wiki/log.md` if notable decision.
+- After: run `<verify>` — the inline command, or `--run` on the ledger. Commit (one task = one commit). If the task carried a ledger, paste its EVIDENCE lines into the task's `wiki/log.md` entry, name any owed or abandoned gate there, and delete `gates/<id>.md`. Then move to `TaskList.md ## Done` and update `STATE.md` if state changed.
 
 ## Enforcement (hook)
 
@@ -84,3 +89,5 @@ The sentinel is gitignored. If the hook blocks a write you believe is exempt, ch
 Red flags, state-vs-log boundaries, when this doesn't apply, after-task checklist details → `.context/task-workflow-appendix.md` (load when needed).
 
 Which role/model executes an approved task, and when to ask before spending on a bigger one → `.context/subagent-delegation.md` (load when executing).
+
+Verification as a ledger of evidence — gate format, the 2-gate threshold, linter rules → `.context/gates-ledger.md` (load when a task crosses the threshold).
