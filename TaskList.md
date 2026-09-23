@@ -38,19 +38,20 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Active work. Should usually have exactly 1 item. More than 2 = drift.*
 
-- [ ] [task-id] — [one-line goal] *(started: YYYY-MM-DD)*
 
 ## Ready
 
 *Approved XML tasks, not yet started. Pick from the top.*
 
-- [ ] [task-id] — [one-line goal]
 
 ## Backlog
 
 *Ideas and unblocked work that hasn't been written as an XML task yet. Promote to Ready by writing the XML task and getting user approval.*
 
-- [ ] [rough description]
+- [ ] plan #2 (records): reference/adr/, STATE NEXT ACTION — the log archive and grep-only rule are deferred until the log has volume
+- [ ] gates.mjs records the *first* line of output as evidence; the line that matched EXPECT would be better evidence (feat-007 G1 recorded a per-suite count, not the total)
+- [ ] add a standing gate that every commit SHA on the board resolves (`git cat-file -t`) — two were written from memory on 2026-09-23 and only caught by a manual check
+- [ ] dogfood the template on a real project — every gate so far is verified against a repo with an empty src/ and no test lane
 
 ## Blocked
 
@@ -62,8 +63,21 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Most recent at top. Trim to last ~20; older ones are findable via `wiki/log.md` + git history.*
 
-- [x] [task-id] — [one-line goal] — `<commit-sha>` *(YYYY-MM-DD)*
+- [x] feat-009 — SETUP.md, gate verification as step 1 — `97cf3b4` — gate-owed? yes *(2026-09-23)*
+- [x] feat-008 — .gitattributes LF pin + zero-CR standard gate — `5e55a48` *(2026-09-23)*
+- [x] feat-007 — budget-check.mjs PostToolUse budget hook — `ce33699` *(2026-09-23)*
+- [x] feat-006 — tests for gate-check.mjs — `68d9e33` *(2026-09-23)*
+- [x] ref-004 — shared test harness + run-all runner — `bbd8a4b` *(2026-09-23)*
+- [x] ref-003 — trim CLAUDE.md, re-base the task-workflow token budget — `8a9ce99` *(2026-09-23)*
+- [x] ref-002 — put `.claude/` + always-load root files behind the gate — `8587043` *(2026-09-23)*
+- [x] ref-001 — `--strict` makes an owed gate blocking — `884dd2b` *(2026-09-23)*
+- [x] bug-001 — pinned-count rule read a regex backreference as a count — `acd7da0` *(2026-09-23)*
+- [x] feat-005 — assumption checklist + blinding lists in subagent-delegation.md — `32b8575` *(2026-09-23)*
+- [x] feat-004 — wire the ledger into the gate (task format, scope table, closeout) — `005fb15` *(2026-09-23)*
+- [x] feat-003 — gates.mjs: --run, --reverify, evidence, timeout, overflow — `eab5370` *(2026-09-23)*
+- [x] feat-002 — gates.mjs: parser, --lint, --status + 25 tests — `cf2d66a` *(2026-09-23)*
+- [x] feat-001 — gate ledger format doc (`.context/gates-ledger.md`) — `3740187` *(2026-09-23)*
 
 ---
 
-*Last updated: [YYYY-MM-DD]*
+*Last updated: 2026-09-23*

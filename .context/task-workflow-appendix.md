@@ -4,7 +4,8 @@
 
 ## After Each Task — Full Checklist
 
-- Run the `<verify>` command (or closest equivalent).
+- Run `<verify>`: the inline command, or `node .claude/scripts/gates.mjs --run gates/<id>.md` when the task carries a ledger.
+- If the task carried a ledger: paste its EVIDENCE lines into the `wiki/log.md` entry, name any owed or abandoned gate there, then delete `gates/<id>.md`. The ledger is working state; the log entry is the record.
 - Commit with a focused message per `rules.md` Git conventions. One task = one commit.
 - Move the task from `## In Progress` to `## Done` in `TaskList.md` with the commit SHA and date.
 - If the task changed the current state of the project (architecture, stack, focus, environments), update the relevant section in `STATE.md`. **Overwrite**, don't append — `STATE.md` is the present, not the past.

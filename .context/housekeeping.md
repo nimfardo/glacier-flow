@@ -88,7 +88,7 @@ On every housekeep:
 
 When the user asks to run housekeeping:
 
-1. **Report current state** — token counts of each always-load file vs targets, file counts in each folder.
+1. **Report current state** — run `node .claude/hooks/budget-check.mjs --all` and `node .claude/scripts/tests/run-all.mjs`, then token counts of the remaining always-load files vs targets, and file counts in each folder.
 2. **Run Rule 1 trims** — propose specific deletions/moves; wait for approval.
 3. **Run Rule 5 STATE.md pruning** — propose specific changes; wait for approval.
 4. **Run Rule 2 archival check** — if any planning subfolder ≥30 files, propose batch archive.
@@ -104,18 +104,23 @@ For an active project at month 6:
 
 | File | Target | Hard limit |
 |---|---|---|
-| `CLAUDE.md` | ~850 | 1100 |
-| `CONTEXT.md` | ~600 | 800 |
-| `STATE.md` | ~300 | 500 |
-| `TaskList.md` | ~400 (most in Done) | 700 |
+| `CLAUDE.md`, `CONTEXT.md`, `STATE.md`, `TaskList.md` | **mechanical** — byte and row limits live only in `.claude/hooks/budget-check.mjs`, enforced on every write and by `--all` here | same |
 | `.context/rules.md` | ~500 (filled in) | 800 |
-| `.context/task-workflow.md` | ~480 (incl. gate table) | 600 |
-| **Always-load total** | **~3,500** | **5,000** |
+| `.context/task-workflow.md` | ~900 (gate table, Closeout, ledger threshold) | 1,200 |
+| **Always-load total** | **~4,000** | **5,500** |
 | Workspace files | 300–1400 each | 1500 |
 | `wiki/index.md` | ~600 (~50 entries) | 1200 |
 | Planning indexes (each) | ~200 | 500 |
 
-If you blow a hard limit, that's the trigger for a housekeep pass whether or not it's "scheduled."
+The byte budgets are enforced; the token figures beside them are estimates, because there is no
+tokenizer in this repo. Where the two disagree, the byte limit is the one that refused your write.
+
+`.context/task-workflow.md`'s limit was re-based from 600 on 2026-09-23. It holds the canonical gate
+table and the ledger threshold; under the One-Place Rule that content cannot move elsewhere, so the
+budget was wrong rather than the file. Trim the other always-load files first — re-basing a limit is a
+decision that needs a reason, not a way to make a number go green.
+
+If you blow a hard limit, that's the trigger for a housekeep pass whether or not it's "scheduled." 
 
 ## When NOT to Housekeep
 

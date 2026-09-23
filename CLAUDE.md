@@ -6,11 +6,11 @@
 
 **Default: plain conversation.** Short sentences, no XML, minimal headers. Answer like a thoughtful colleague.
 
-**Structure fires on intent.** When the user asks for a write action ("add a button", "fix this bug", "create the spec") or when a decision is being committed, switch to the XML task wrapper from `.context/task-workflow.md`. The gate is non-negotiable; the conversation around it can stay light.
+**Structure fires on intent.** A write action, or a decision being committed, switches to the XML task wrapper from `.context/task-workflow.md`. The gate is non-negotiable; the conversation around it stays light.
 
-**Depth is opt-in.** Trigger words: "tell me more", "explain", "why", "details", "show me how", "walk me through it". Without those signals, give the short answer.
+**Depth is opt-in.** "tell me more", "explain", "why", "walk me through it". Without those, give the short answer.
 
-**Silent workspace loading.** When the user's intent maps to a workspace (a bug → debugging, a new feature → feature-development, a Figma link or "implement this design" → design-to-code, ingesting a doc → research), load that workspace silently. Don't announce *"I've loaded the debugging workspace"*. The workspace rules apply; the user just sees Claude being helpful.
+**Silent workspace loading.** Intent maps to a workspace (bug → debugging, feature → feature-development, Figma link → design-to-code, ingesting a doc → research). Load it silently; never announce it.
 
 ## Project Identity
 
@@ -23,11 +23,7 @@
 
 **Root files (always-load):** `CLAUDE.md` · `CONTEXT.md` · `STATE.md` · `TaskList.md`
 
-**`.context/`** — canonical project rules:
-- `identity.md` · `rules.md` · `glossary.md`
-- `task-workflow.md` (gate; always-load) · `task-workflow-appendix.md` (on-demand)
-- `subagent-delegation.md` (on-demand; role routing + cost gate for executing approved tasks)
-- `housekeeping.md` (on-demand)
+**`.context/`** — canonical project rules: `identity.md` · `rules.md` · `glossary.md` · `task-workflow.md` (gate; always-load) · `task-workflow-appendix.md` · `subagent-delegation.md` (role routing + cost gate) · `gates-ledger.md` (verification format) · `housekeeping.md`
 
 **`workspaces/`** — task-type contexts: `feature-development/`, `design-to-code/`, `design-authoring/`, `debugging/`, `refactoring/`, `planning/`, `research/`
 
@@ -35,19 +31,21 @@
 
 **`planning/`** — artifacts: `stories/`, `specs/`, `plans/` (each has `index.md`)
 
+**`gates/`** — one verification ledger per task in flight; deleted at close
+
 **`reference/`** — deep docs YOU wrote (loaded on demand)
 
 **`raw/`** — immutable source documents (PDFs, transcripts, articles, Figma exports)
 
 **`wiki/`** — LLM-maintained knowledge: `index.md`, `log.md`, `entities/`, `concepts/`, `sources/`
 
-**`src/`** — your actual code. This template does **not** hardcode an architecture — layer/folder conventions are a per-project decision, documented once you make it in `reference/architecture/` (see `src/README.md`).
+**`src/`** — your actual code. No architecture is hardcoded; layer/folder conventions are a per-project decision recorded in `reference/architecture/` (see `src/README.md`).
 
 ## Routing Rule
 
-Before doing anything, read `CONTEXT.md` to find which workspace applies. Then load only that workspace's `CONTEXT.md` and the specific files it points to.
+Read `CONTEXT.md` first; load only the workspace it names and the files that workspace points to.
 
-**Do NOT** load the entire `reference/` folder. **Do NOT** load the whole `wiki/` — always start with `wiki/index.md` and drill in.
+**Never** load all of `reference/` or `wiki/` — start at `wiki/index.md` and drill in.
 
 ## Canonical Sources (the One-Place Rule)
 
@@ -59,32 +57,32 @@ Every fact lives in exactly one file. Other files point to it; they never copy i
 - Project decisions, project-specific patterns → `reference/`
 - Chosen architecture / folder conventions for `src/` (once decided) → `reference/architecture/`
 - Design tokens, component inventory (once decided) → `reference/design-system.md`
+- Verification format (gates, evidence, linter rules) → `.context/gates-ledger.md`
 - Accumulated knowledge from external sources → `wiki/`
 
 ## Authority Boundary
 
 Four content folders, in decreasing authority:
 
-- **`.context/`** = absolute project rules. Highest authority.
-- **`reference/`** = things YOU decided about THIS project. Authoritative for project decisions.
-- **`planning/`** = authoritative for *in-flight* work while `status: draft | approved | in-progress`. After `done`, becomes historical record.
-- **`wiki/`** = knowledge compiled from external sources. Informational only.
+- **`.context/`** = absolute project rules. Highest.
+- **`reference/`** = what YOU decided about THIS project.
+- **`planning/`** = authoritative while `draft | approved | in-progress`; historical once `done`.
+- **`wiki/`** = compiled from external sources. Informational only.
 
-If a wiki page contradicts a reference file, the reference file wins. If a done planning artifact contradicts current code, the code wins. Always surface contradictions to the user.
+Reference beats wiki. Code beats a done planning artifact. Always surface the contradiction (`.context/rules.md`, non-negotiable 6).
 
 ## State vs Log Boundary
 
 - `STATE.md` = how things ARE right now. No history. Overwrite freely.
 - `TaskList.md` = work-in-flight. The kanban board.
 - `wiki/log.md` = what HAPPENED, append-only, chronological.
-- Never duplicate between them. A completed task moves from `TaskList.md` to `wiki/log.md`; it doesn't live in both.
+- Never duplicate. A completed task moves from `TaskList.md` to `wiki/log.md`; it never lives in both.
 
 ## Naming Conventions
 
-- Folders & markdown files: `kebab-case`
-- Task IDs: see `TaskList.md` (canonical list)
+- Folders & markdown files: `kebab-case` · Task IDs: `TaskList.md` (canonical)
 - Wiki pages: `wiki/{entities,concepts,sources}/[slug].md`
-- Planning artifacts: same slug across story/spec/plan (e.g. `dashboard-export.md` in all three).
+- Planning artifacts: one slug across story/spec/plan (`dashboard-export.md` in all three).
 
 ## When in Doubt
 
