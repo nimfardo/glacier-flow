@@ -14,9 +14,9 @@ A general-purpose template combining four complementary patterns:
 This template started as a fork of [dragon-ice-flow](https://github.com/niellune/dragon-ice-flow), then diverged in seven ways:
 
 1. **Architecture is pluggable, not hardcoded.** The original bakes in Feature-Sliced Design as a non-negotiable rule. This version ships `reference/architecture/` empty — you (or Claude, with your approval) document whatever pattern fits *this* project the first time it matters, or skip it entirely for non-frontend work. FSD is available as an inert preset in `reference/architecture/_presets/` for the projects where it does fit.
-2. **A `design-to-code` workspace was added.** Built for going from a Figma frame (or a screenshot, or "make it look like X") to working code — visual QA against the design, design tokens as the source of truth for values, and a Definition of Done that covers states (hover/empty/error/loading), not just the happy path.
+2. **A `design-to-code` workspace was added.** Built for going from a Figma frame (or a screenshot, or "make it look like X") to working code — visual QA against the design, design tokens as the source of truth for values, and a Definition of Done that covers states (hover/empty/error/loading), not just the happy path. Visual QA is done by a separate, blinded visual reviewer — never the agent that built the screen — and recurring mistakes collect in a known-failure-patterns table. A design-system skeleton (`reference/_presets/design-system.md`) maps Figma variables to code names and tracks which states are built and signed off.
 3. **The write-gate hook is cross-platform.** `.claude/hooks/gate-check.mjs` runs on Node, so the gate fires identically on macOS, Linux, and Windows. The original ships PowerShell-only.
-4. **Delegation is role-based and cost-gated.** `.context/subagent-delegation.md` routes approved work by role (implementer / verifier / housekeeper) rather than by model name, and requires explicit approval before escalating to an expensive tier. The original hardcodes a fixed model lineup.
+4. **Delegation is role-based and cost-gated.** `.context/subagent-delegation.md` routes approved work by role (implementer / visual reviewer / verifier / housekeeper) rather than by model name, blinds each reviewing role to the builder's reasoning, and requires explicit approval before escalating to an expensive tier. The original hardcodes a fixed model lineup.
 5. **A `design-authoring` workspace was added** — the reverse of `design-to-code`: agent-scripted authoring *in* Figma (screens, components, variables) via the Plugin API. It treats the Figma file as a gated production surface, encodes the Plugin API rules that fail silently when ignored (font loading, auto-layout property order, staged builds), verifies mutations with property reads instead of screenshots, and keeps a growing known-failure-patterns table. The tool-convention approach is distilled from [figmosha2](https://github.com/denysosadchyi/figmosha2)'s conventions plus accumulated project experience.
 6. **A contradiction guard was added.** A request that contradicts a decision already written in `reference/` or `.context/` gets surfaced, not silently applied or silently dropped (`.context/rules.md`, non-negotiable 6). It reuses `wiki/log.md`'s existing, already-windowed `decision` entries rather than adding a new always-growing file.
 
@@ -53,7 +53,7 @@ your-project/
 ├── .claude/
 │   ├── settings.json      ← registers both hooks
 │   ├── hooks/             ← gate-check.mjs (the XML gate), budget-check.mjs (always-load budgets)
-│   └── scripts/           ← gates.mjs (ledger runner + linter), tests/ (70 tests, zero dependencies)
+│   └── scripts/           ← gates.mjs (ledger runner + linter), tests/ (71 tests, zero dependencies)
 │
 ├── .context/
 │   ├── identity.md
@@ -69,7 +69,7 @@ your-project/
 ├── skills/                ← brainstorm (and future skills)
 ├── planning/              ← stories, specs, plans (each with index.md)
 ├── gates/                 ← one verification ledger per task in flight; deleted at close
-├── reference/             ← deep docs YOU wrote, incl. architecture/ (empty until you decide)
+├── reference/             ← deep docs YOU wrote, incl. architecture/ (empty until you decide); _presets/ holds inert starters
 │
 ├── raw/                   ← immutable sources
 ├── wiki/                  ← LLM-maintained knowledge (index, log, entities, concepts, sources)
@@ -104,7 +104,7 @@ Just describe what you need. Claude will pick the workspace silently. Examples:
 | You say | What happens |
 |---|---|
 | "I want to add export to dashboards" | feature-development workspace, XML task proposed |
-| "Implement this Figma frame" (link or screenshot) | design-to-code workspace, visual QA in the DoD |
+| "Implement this Figma frame" (link or screenshot) | design-to-code workspace, every state checked by a blinded visual reviewer |
 | "Build this component set in Figma" | design-authoring workspace, gated Figma mutations, verified by property reads |
 | "There's a weird bug with login" | debugging workspace, diagnostic questions |
 | "Let's think through options for caching" | brainstorm skill, divergent mode |
@@ -124,7 +124,7 @@ Real projects accumulate files. Without rules, the always-load budget grows and 
 
 The full ruleset lives in `.context/housekeeping.md`. It's a *proposal* workflow — Claude lists what should be trimmed; you approve before anything moves.
 
-The always-load budgets are enforced rather than merely documented: `.claude/hooks/budget-check.mjs` refuses a write that pushes `CLAUDE.md`, `CONTEXT.md`, `STATE.md` or `TaskList.md` past its byte limit, and reports on all four during a housekeep. Byte limits rather than token targets, because bytes are measurable in the repo and an unenforceable budget is a wish.
+The always-load budgets are enforced rather than merely documented: `.claude/hooks/budget-check.mjs` refuses a write that pushes the root `CLAUDE.md`, `CONTEXT.md`, `STATE.md` or `TaskList.md` past its byte limit (a workspace's own `CONTEXT.md` is not budgeted), and reports on all four during a housekeep. Byte limits rather than token targets, because bytes are measurable in the repo and an unenforceable budget is a wish.
 
 ## Core Principles
 

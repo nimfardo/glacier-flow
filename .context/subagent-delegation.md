@@ -14,7 +14,7 @@ Routing is by **role**, not by model name. Roles are stable; model names go stal
 |---|---|---|
 | Planning — authoring `<task>` / `<plan>` XML, stories, specs | Main agent (never delegated) | session model |
 | Code execution — implementing an approved task on `src/`, `reference/`, `.context/` | Implementer subagent | Opus |
-| Visual QA — checking an implementation against a Figma frame or mock (`design-to-code`) | Implementer subagent | Opus |
+| Visual QA — checking an implementation against a Figma frame or mock (design-to-code, and design-authoring's final pass) | Visual reviewer subagent | Opus |
 | Verify + commit + docs — running `<verify>`, committing, board moves, `STATE.md`, `wiki/log.md`, index updates | Verifier subagent | Sonnet |
 | Housekeeping — after the last task of a `<plan>` | Verifier subagent | Sonnet |
 
@@ -25,6 +25,9 @@ Planning is never delegated away from the main context: the approval gate faces 
 Where the task carries a ledger, it runs `node .claude/scripts/gates.mjs --reverify gates/<id>.md` — the
 task's single re-execution. Nobody runs the lanes after it, and a pass that did not re-verify has not
 verified. It returns the assumption checklist below as a required output.
+**Visual reviewer** opens the running build (or the Figma file, for authoring), compares each in-scope state to the
+design source, and returns a defect list per state. It never fixes anything. Its report is what the owner reads
+before signing the manual state gates.
 **Housekeeper** runs the sequence in `.context/housekeeping.md`. Still proposal-only: findings come back for user approval, never autonomous cleanup.
 
 ## Blinding
@@ -38,6 +41,7 @@ guaranteed to be true.
 |---|---|---|
 | Implementer | The XML task verbatim, the files in `<read>` / `<write>`, the ledger | The verifier's report from an earlier round |
 | Verifier | The XML task, the diff, the ledger, the `<assumptions>` list | The implementer's reasoning or working notes — the diff is the claim, not the story behind it |
+| Visual reviewer | The design source (Figma node / mock), the build, the task's states list | The implementer's notes, reasoning, or diff summary |
 
 Blinding is by *file*, not by instruction. A role that has to be told not to think about something it
 has already read was blinded too late.
@@ -78,6 +82,7 @@ Default posture: cheapest tier that can do the job, escalate on request. Not: be
 
 1. User approves the XML task → main agent opens the gate sentinel (`.claude/gate-open`).
 2. Main agent spawns the **implementer** with the full XML task; it implements and reports back.
+   For design tasks, the main agent then spawns the **visual reviewer**; its defect list goes back to step 2 or on to the verifier.
 3. Main agent spawns the **verifier** to run `<verify>`, commit (one task = one commit), and do the bookkeeping (TaskList move, `STATE.md`, `wiki/log.md`).
 4. Main agent closes the sentinel and reviews the result before starting the next task.
 

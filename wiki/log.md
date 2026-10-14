@@ -130,3 +130,85 @@ ledger-optional (an optional gate is skipped exactly when the task is risky).
 **Contradicts:** the decision immediately above (this same log, "rule 2 relaxed"), reversed rather than edited.
 **Option:** spec-update
 **Propagated:** `.context/rules.md` rule 2 restored and sharpened: never push directly to `main` — branch, push the branch, open a PR. This batch of commits moves to a branch instead of staying on local `main`.
+
+## [2026-10-14] feat | visual QA moves to a blinded visual reviewer
+
+feat-010 (plan design-flow-hardening). Role Routing now assigns Visual QA to a Visual reviewer subagent
+(design-to-code, and design-authoring's final pass) instead of the implementer who built the work. It compares
+each in-scope state to the design source, returns a defect list per state, never fixes, and the owner reads
+its report before signing manual state gates. Blinding table gains its row (never opens the implementer's
+notes, reasoning or diff summary); both workspace step 5s point to it without restating the rules. Text only,
+no Figma file touched. Tier and cost gate unchanged.
+
+Evidence (ledger gates/feat-010.md, `--reverify`):
+
+```
+met 2026-10-14T16:10:03Z exit=0 digest=f835bc9b out="| Visual QA — checking an implementation against a Figma frame or mock (design-to-code, and design-authoring's final pass) | Visual reviewer subagent | Opus |"
+met 2026-10-14T16:10:03Z exit=0 digest=568ab7b4 out="| Visual reviewer | The design source (Figma node / mock), the build, the task's states list | The implementer's notes, reasoning, or diff summary |"
+met 2026-10-14T16:10:04Z exit=0 digest=9069e968 out="design-to-code:yes design-authoring:yes"
+met 2026-10-14T16:10:04Z exit=0 digest=e6a98ca5 out="restated:0"
+met 2026-10-14T16:10:06Z exit=0 digest=329346a5 out="11 run, 11 passed"
+met 2026-10-14T16:10:06Z exit=0 digest=fc1a658b out="budget-check: ok (4 file(s))"
+met 2026-10-14T16:10:06Z exit=0 digest=3fa1853e out="scanned"
+```
+
+## [2026-10-14] feat | design-system skeleton ships as an inert preset
+
+feat-011 (plan design-flow-hardening). `reference/_presets/design-system.md` gives a project a ready
+skeleton for `reference/design-system.md`: Tokens (color, type, spacing, radius — Figma variable · code
+name · value · note) and Components (name · Figma node · code path · states built · states signed), each
+with a how-to-fill line and one empty row. Structure only, no invented values. Follows the existing
+"_presets = not in force until copied up" convention, so the plan's `_templates/` name became `_presets/`
+(plan path fixed). `reference/index.md` Design System section now points at the preset and how to adopt it.
+Workspaces still say "reference/design-system.md (if it exists)"; none edited, and no live file created.
+
+Evidence (ledger gates/feat-011.md, `--reverify`):
+
+```
+met 2026-10-14T16:16:40Z exit=0 digest=283af31e out="tokens:yes components:yes signed-col:yes"
+met 2026-10-14T16:16:40Z exit=0 digest=cc1f0434 out="> **A preset, not this project's design system.** Not in force until copied to reference/design-system.md."
+met 2026-10-14T16:16:40Z exit=0 digest=04d43af1 out="link:yes exists:yes"
+met 2026-10-14T16:16:40Z exit=0 digest=de58f651 out="preset only"
+met 2026-10-14T16:16:43Z exit=0 digest=329346a5 out="11 run, 11 passed"
+met 2026-10-14T16:16:43Z exit=0 digest=fc1a658b out="budget-check: ok (4 file(s))"
+met 2026-10-14T16:16:43Z exit=0 digest=3fa1853e out="scanned"
+```
+
+## [2026-10-14] feat | design-to-code gets a Known Failure Patterns table
+
+feat-012 (plan design-flow-hardening). `workspaces/design-to-code/CONTEXT.md` gains "## Known Failure Patterns"
+before "## Anti-Patterns", copying design-authoring's format: same heading, same append-when-it-bites-twice
+rule, Symptom | Likely cause / fix table. Four seed rows, each rephrased from an existing Anti-Patterns line
+(non-token hex/px; only default state; diff right but browser wrong, pointing at the visual reviewer in
+subagent-delegation.md; low-contrast text shipped as designed). Nothing invented, no other section changed,
+design-authoring untouched. Note: editing any workspaces/*/CONTEXT.md trips a false "CONTEXT.md budget 4096"
+message from the PostToolUse hook (budget-check matches by basename); known, separate task, `--all` (G5) is the real check.
+
+Evidence (ledger gates/feat-012.md, `--reverify`):
+
+```
+met 2026-10-14T16:32:37Z exit=0 digest=3ddf3d90 out="section:yes rows:4"
+met 2026-10-14T16:32:37Z exit=0 digest=47de0e24 out="Recognized symptom → likely cause. **Append to this list whenever the same failure bites twice** — this section is the designated home for accumulated design-to"
+met 2026-10-14T16:32:37Z exit=0 digest=fb6a31a1 out="authoring:unchanged"
+met 2026-10-14T16:32:40Z exit=0 digest=329346a5 out="11 run, 11 passed"
+met 2026-10-14T16:32:40Z exit=0 digest=fc1a658b out="budget-check: ok (4 file(s))"
+met 2026-10-14T16:32:40Z exit=0 digest=3fa1853e out="scanned"
+```
+
+## [2026-10-14] bug | budget hook scoped to the root files
+
+bug-002. `.claude/hooks/budget-check.mjs` matched budgets by basename, so any workspaces/*/CONTEXT.md tripped
+the 4096-byte CONTEXT.md budget on every edit. Hook mode and --all now match by path relative to the project
+root (case-insensitive); explicit `--path FILE` still picks the budget by name, since the caller chose the file.
+Budget numbers unchanged. Regression test added (failed on the old hook, passes now). Resolves the false
+positive noted in the feat-012 entry above.
+
+Evidence (ledger gates/bug-002.md, `--reverify`):
+
+```
+met 2026-10-14T16:45:59Z exit=0 digest=9f44cc9d out="exit:0 size:6636"
+met 2026-10-14T16:45:59Z exit=0 digest=a72a29c9 out="exit:2"
+met 2026-10-14T16:46:02Z exit=0 digest=329346a5 out="12 run, 12 passed"
+met 2026-10-14T16:46:02Z exit=0 digest=fc1a658b out="budget-check: ok (4 file(s))"
+met 2026-10-14T16:46:02Z exit=0 digest=3fa1853e out="scanned"
+```

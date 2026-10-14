@@ -43,6 +43,9 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Approved XML tasks, not yet started. Pick from the top.*
 
+- [ ] feat-013 — "Reading Figma Cheaply" rules in design-to-code *(plan: design-flow-hardening)*
+- [ ] feat-014 — STATE Next Action line + fresh-session rule *(plan: design-flow-hardening)*
+
 
 ## Backlog
 
@@ -58,12 +61,16 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Tasks that can't proceed. Note the blocker.*
 
-- [ ] [task-id] — [one-line goal] — **blocked by:** [reason]
+- [ ] feat-015 — dogfood design-to-code on CortiPix node 96:7550 — **blocked by:** code target + stack undecided; feat-010…014
 
 ## Done
 
 *Most recent at top. Trim to last ~20; older ones are findable via `wiki/log.md` + git history.*
 
+- [x] bug-002 — budget hook matches root files by relative path, not basename — `1b4ea5f` *(2026-10-14)*
+- [x] feat-012 — Known Failure Patterns table in design-to-code — `99b0d62` *(2026-10-14)*
+- [x] feat-011 — design-system skeleton as inert reference/_presets/ file — `8a4c365` *(2026-10-14)*
+- [x] feat-010 — blinded visual reviewer role for design QA — `5b804ae` *(2026-10-14)*
 - [x] feat-009 — SETUP.md, gate verification as step 1 — `97cf3b4` — gate-owed? yes *(2026-09-23)*
 - [x] feat-008 — .gitattributes LF pin + zero-CR standard gate — `5e55a48` *(2026-09-23)*
 - [x] feat-007 — budget-check.mjs PostToolUse budget hook — `ce33699` *(2026-09-23)*
