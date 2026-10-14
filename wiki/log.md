@@ -151,3 +151,25 @@ met 2026-10-14T16:10:06Z exit=0 digest=329346a5 out="11 run, 11 passed"
 met 2026-10-14T16:10:06Z exit=0 digest=fc1a658b out="budget-check: ok (4 file(s))"
 met 2026-10-14T16:10:06Z exit=0 digest=3fa1853e out="scanned"
 ```
+
+## [2026-10-14] feat | design-system skeleton ships as an inert preset
+
+feat-011 (plan design-flow-hardening). `reference/_presets/design-system.md` gives a project a ready
+skeleton for `reference/design-system.md`: Tokens (color, type, spacing, radius — Figma variable · code
+name · value · note) and Components (name · Figma node · code path · states built · states signed), each
+with a how-to-fill line and one empty row. Structure only, no invented values. Follows the existing
+"_presets = not in force until copied up" convention, so the plan's `_templates/` name became `_presets/`
+(plan path fixed). `reference/index.md` Design System section now points at the preset and how to adopt it.
+Workspaces still say "reference/design-system.md (if it exists)"; none edited, and no live file created.
+
+Evidence (ledger gates/feat-011.md, `--reverify`):
+
+```
+met 2026-10-14T16:16:40Z exit=0 digest=283af31e out="tokens:yes components:yes signed-col:yes"
+met 2026-10-14T16:16:40Z exit=0 digest=cc1f0434 out="> **A preset, not this project's design system.** Not in force until copied to reference/design-system.md."
+met 2026-10-14T16:16:40Z exit=0 digest=04d43af1 out="link:yes exists:yes"
+met 2026-10-14T16:16:40Z exit=0 digest=de58f651 out="preset only"
+met 2026-10-14T16:16:43Z exit=0 digest=329346a5 out="11 run, 11 passed"
+met 2026-10-14T16:16:43Z exit=0 digest=fc1a658b out="budget-check: ok (4 file(s))"
+met 2026-10-14T16:16:43Z exit=0 digest=3fa1853e out="scanned"
+```

@@ -10,7 +10,7 @@
 
 ## Design System
 
-*Add `design-system.md` here once this project has one (design tokens, component inventory). See `workspaces/design-to-code/CONTEXT.md` for how it's used.*
+- [`_presets/design-system.md`](_presets/design-system.md) — skeleton for `design-system.md` (token map Figma ↔ code, component inventory with signed states). **Not in force** until copied to `reference/design-system.md` through the code gate. See `workspaces/design-to-code/CONTEXT.md` for how it's used.
 
 ## Conventions
 

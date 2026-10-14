@@ -59,7 +59,7 @@ only (A3, B1 pointers); nothing is pushed to the file. C1 reads node `96:7550` a
     <goal>A project can start reference/design-system.md from a ready skeleton instead of a blank file.</goal>
     <files>
       <read>reference/index.md, reference/architecture/_presets/ (convention), workspaces/design-to-code/CONTEXT.md</read>
-      <write>reference/_templates/design-system.md, reference/index.md (one line)</write>
+      <write>reference/_presets/design-system.md, reference/index.md (one line)</write>
     </files>
     <action>Skeleton only, no invented values: Tokens (color, type, spacing, radius — each with Figma variable name ↔ code name), Components table (name · Figma node · code path · states built · states signed). Inert like _presets: workspaces still say "if reference/design-system.md exists".</action>
     <verify>ledger gates/feat-011.md — G1 skeleton has both sections, G2 index line resolves to the file, G3 no workspace treats the template as the live file, R1–R4</verify>
