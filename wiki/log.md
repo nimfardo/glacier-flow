@@ -173,3 +173,24 @@ met 2026-10-14T16:16:43Z exit=0 digest=329346a5 out="11 run, 11 passed"
 met 2026-10-14T16:16:43Z exit=0 digest=fc1a658b out="budget-check: ok (4 file(s))"
 met 2026-10-14T16:16:43Z exit=0 digest=3fa1853e out="scanned"
 ```
+
+## [2026-10-14] feat | design-to-code gets a Known Failure Patterns table
+
+feat-012 (plan design-flow-hardening). `workspaces/design-to-code/CONTEXT.md` gains "## Known Failure Patterns"
+before "## Anti-Patterns", copying design-authoring's format: same heading, same append-when-it-bites-twice
+rule, Symptom | Likely cause / fix table. Four seed rows, each rephrased from an existing Anti-Patterns line
+(non-token hex/px; only default state; diff right but browser wrong, pointing at the visual reviewer in
+subagent-delegation.md; low-contrast text shipped as designed). Nothing invented, no other section changed,
+design-authoring untouched. Note: editing any workspaces/*/CONTEXT.md trips a false "CONTEXT.md budget 4096"
+message from the PostToolUse hook (budget-check matches by basename); known, separate task, `--all` (G5) is the real check.
+
+Evidence (ledger gates/feat-012.md, `--reverify`):
+
+```
+met 2026-10-14T16:32:37Z exit=0 digest=3ddf3d90 out="section:yes rows:4"
+met 2026-10-14T16:32:37Z exit=0 digest=47de0e24 out="Recognized symptom → likely cause. **Append to this list whenever the same failure bites twice** — this section is the designated home for accumulated design-to"
+met 2026-10-14T16:32:37Z exit=0 digest=fb6a31a1 out="authoring:unchanged"
+met 2026-10-14T16:32:40Z exit=0 digest=329346a5 out="11 run, 11 passed"
+met 2026-10-14T16:32:40Z exit=0 digest=fc1a658b out="budget-check: ok (4 file(s))"
+met 2026-10-14T16:32:40Z exit=0 digest=3fa1853e out="scanned"
+```

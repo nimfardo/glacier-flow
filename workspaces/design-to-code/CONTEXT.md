@@ -57,6 +57,17 @@ If the source is a screenshot or informal reference with no Figma file behind it
 | Where the new file goes | `reference/architecture/` (if it exists — see `CONTEXT.md`) |
 | A component reused across the app | `reference/ui-patterns.md` (if it exists) |
 
+## Known Failure Patterns
+
+Recognized symptom → likely cause. **Append to this list whenever the same failure bites twice** — this section is the designated home for accumulated design-to-code gotchas, so they stop living in one person's (or one agent's) memory.
+
+| Symptom | Likely cause / fix |
+|---|---|
+| A hex/px value that isn't a token shows up in the build | Eyeballed from a screenshot, or the token is missing — pull Figma variables; add the token or flag it as a one-off |
+| Only the default state works; hover/empty/error missing | Figma showed only the happy path — ask which states matter before building |
+| Diff looks right, browser looks wrong | Never opened in a browser — visual reviewer pass (`.context/subagent-delegation.md`) |
+| Low-contrast or inaccessible text shipped "as designed" | Frame treated as gospel — flag it, don't ship it silently |
+
 ## Anti-Patterns
 
 - ❌ Hardcoding a hex/px value that already exists as a design token

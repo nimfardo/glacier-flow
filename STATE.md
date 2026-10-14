@@ -18,11 +18,11 @@ holds all of it and is unpushed.
 
 *Last 5 completed tasks. Older ones live in `wiki/log.md`.*
 
+- feat-012 — Known Failure Patterns table in design-to-code (2026-10-14)
 - feat-011 — design-system skeleton as inert reference/_presets/ file (2026-10-14)
 - feat-010 — blinded visual reviewer role for design QA (2026-10-14)
 - feat-009 — SETUP.md with gate verification as step 1 (2026-09-23)
 - feat-008 — .gitattributes LF pin + zero-CR standard gate (2026-09-23)
-- feat-007 — budget-check.mjs PostToolUse budget hook (2026-09-23)
 
 ## Known Issues
 

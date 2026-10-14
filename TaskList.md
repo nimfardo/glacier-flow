@@ -38,12 +38,12 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Active work. Should usually have exactly 1 item. More than 2 = drift.*
 
+- [ ] feat-012 — Known Failure Patterns table in design-to-code *(plan: design-flow-hardening)*
 
 ## Ready
 
 *Approved XML tasks, not yet started. Pick from the top.*
 
-- [ ] feat-012 — Known Failure Patterns table in design-to-code *(plan: design-flow-hardening)*
 - [ ] feat-013 — "Reading Figma Cheaply" rules in design-to-code *(plan: design-flow-hardening)*
 - [ ] feat-014 — STATE Next Action line + fresh-session rule *(plan: design-flow-hardening)*
 
