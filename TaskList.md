@@ -43,6 +43,12 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Approved XML tasks, not yet started. Pick from the top.*
 
+- [ ] feat-010 — blinded visual reviewer role for design QA *(plan: design-flow-hardening)*
+- [ ] feat-011 — reference/_templates/design-system.md skeleton *(plan: design-flow-hardening)*
+- [ ] feat-012 — Known Failure Patterns table in design-to-code *(plan: design-flow-hardening)*
+- [ ] feat-013 — "Reading Figma Cheaply" rules in design-to-code *(plan: design-flow-hardening)*
+- [ ] feat-014 — STATE Next Action line + fresh-session rule *(plan: design-flow-hardening)*
+
 
 ## Backlog
 
@@ -58,7 +64,7 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Tasks that can't proceed. Note the blocker.*
 
-- [ ] [task-id] — [one-line goal] — **blocked by:** [reason]
+- [ ] feat-015 — dogfood design-to-code on CortiPix node 96:7550 — **blocked by:** code target + stack undecided; feat-010…014
 
 ## Done
 

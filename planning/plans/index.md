@@ -5,7 +5,7 @@
 ## Active
 *Plans with status `draft`, `approved`, or `in-progress`.*
 
-- [no plans yet]
+- [design-flow-hardening](design-flow-hardening.md) — blinded visual QA, cheap Figma reads, real run on CortiPix — approved
 
 ## Done
 *Completed plans. Trim to last ~10; older ones findable via `wiki/log.md` + git history.*
