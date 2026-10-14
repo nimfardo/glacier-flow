@@ -64,7 +64,7 @@ Recognized symptom → likely cause. **Append to this list whenever the same fai
 2. **Discover before creating.** Read the file's existing components, variables, and naming first. The one-place rule applies to design files too: reuse the existing token/component; never create a parallel one.
 3. **Write the XML task** per `.context/task-workflow.md`. In `<action>`, name the target file/page/node IDs and the mutations; in `<verify>`, name the property reads that prove each stage.
 4. **Get approval, then execute in stages** — structure, then bindings, then content — verifying each stage with reads before the next.
-5. **Final visual QA** with a screenshot for anything user-visible.
+5. **Final visual QA** with a screenshot for anything user-visible. The visual reviewer in `.context/subagent-delegation.md` runs this pass, not the implementer.
 6. **Update `reference/design-system.md`** (if it exists) when new tokens or components were introduced — same rule as `design-to-code`, opposite direction.
 
 ## Definition of Done

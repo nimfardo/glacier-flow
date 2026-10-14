@@ -31,7 +31,7 @@ If the source is a screenshot or informal reference with no Figma file behind it
 2. **Reconcile with `reference/design-system.md`** (if it exists). New color/spacing/type values that aren't already tokens are a decision, not a detail — surface them to the user before hardcoding: "this frame uses a spacing value that isn't in the token set — add it as a token, or one-off?"
 3. **Write the XML task** per `.context/task-workflow.md`. In `<action>`, name the design source (Figma link/node ID, or screenshot description) and which states are in scope.
 4. **Get approval, then build.** Same rules as `feature-development`: smallest shippable slice, no scope creep.
-5. **Visual QA in a real browser** before calling it done — per the project-wide rule that UI changes get checked in a running app, not just inferred from the diff. Compare side-by-side against the design source.
+5. **Visual QA in a real browser** before calling it done — per the project-wide rule that UI changes get checked in a running app, not just inferred from the diff. Compare side-by-side against the design source. The visual reviewer in `.context/subagent-delegation.md` runs this pass, not the implementer.
 6. **Update `reference/design-system.md`** if a new token was introduced (separate write, still under this task if it's the same `<files><write>` list — don't silently expand scope).
 
 **Rolling out to many similar screens/components?** Don't repeat the same decision N times sequentially. Build and get sign-off on one sample first — it sets the conventions. Then fan out parallel subagents against that approved sample plus this file, and collect their findings as one defect list before fixing anything. Fix at the source (the token or component), not per screen.

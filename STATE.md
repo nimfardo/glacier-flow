@@ -18,11 +18,11 @@ holds all of it and is unpushed.
 
 *Last 5 completed tasks. Older ones live in `wiki/log.md`.*
 
+- feat-010 — blinded visual reviewer role for design QA (2026-10-14)
 - feat-009 — SETUP.md with gate verification as step 1 (2026-09-23)
 - feat-008 — .gitattributes LF pin + zero-CR standard gate (2026-09-23)
 - feat-007 — budget-check.mjs PostToolUse budget hook (2026-09-23)
 - feat-006 — tests for gate-check.mjs (2026-09-23)
-- ref-004 — shared test harness + run-all runner (2026-09-23)
 
 ## Known Issues
 

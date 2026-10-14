@@ -38,12 +38,12 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Active work. Should usually have exactly 1 item. More than 2 = drift.*
 
+- [ ] feat-010 — blinded visual reviewer role for design QA *(plan: design-flow-hardening)*
 
 ## Ready
 
 *Approved XML tasks, not yet started. Pick from the top.*
 
-- [ ] feat-010 — blinded visual reviewer role for design QA *(plan: design-flow-hardening)*
 - [ ] feat-011 — reference/_templates/design-system.md skeleton *(plan: design-flow-hardening)*
 - [ ] feat-012 — Known Failure Patterns table in design-to-code *(plan: design-flow-hardening)*
 - [ ] feat-013 — "Reading Figma Cheaply" rules in design-to-code *(plan: design-flow-hardening)*

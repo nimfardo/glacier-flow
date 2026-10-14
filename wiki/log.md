@@ -130,3 +130,24 @@ ledger-optional (an optional gate is skipped exactly when the task is risky).
 **Contradicts:** the decision immediately above (this same log, "rule 2 relaxed"), reversed rather than edited.
 **Option:** spec-update
 **Propagated:** `.context/rules.md` rule 2 restored and sharpened: never push directly to `main` — branch, push the branch, open a PR. This batch of commits moves to a branch instead of staying on local `main`.
+
+## [2026-10-14] feat | visual QA moves to a blinded visual reviewer
+
+feat-010 (plan design-flow-hardening). Role Routing now assigns Visual QA to a Visual reviewer subagent
+(design-to-code, and design-authoring's final pass) instead of the implementer who built the work. It compares
+each in-scope state to the design source, returns a defect list per state, never fixes, and the owner reads
+its report before signing manual state gates. Blinding table gains its row (never opens the implementer's
+notes, reasoning or diff summary); both workspace step 5s point to it without restating the rules. Text only,
+no Figma file touched. Tier and cost gate unchanged.
+
+Evidence (ledger gates/feat-010.md, `--reverify`):
+
+```
+met 2026-10-14T16:10:03Z exit=0 digest=f835bc9b out="| Visual QA — checking an implementation against a Figma frame or mock (design-to-code, and design-authoring's final pass) | Visual reviewer subagent | Opus |"
+met 2026-10-14T16:10:03Z exit=0 digest=568ab7b4 out="| Visual reviewer | The design source (Figma node / mock), the build, the task's states list | The implementer's notes, reasoning, or diff summary |"
+met 2026-10-14T16:10:04Z exit=0 digest=9069e968 out="design-to-code:yes design-authoring:yes"
+met 2026-10-14T16:10:04Z exit=0 digest=e6a98ca5 out="restated:0"
+met 2026-10-14T16:10:06Z exit=0 digest=329346a5 out="11 run, 11 passed"
+met 2026-10-14T16:10:06Z exit=0 digest=fc1a658b out="budget-check: ok (4 file(s))"
+met 2026-10-14T16:10:06Z exit=0 digest=3fa1853e out="scanned"
+```
