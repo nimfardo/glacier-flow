@@ -38,6 +38,7 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Active work. Should usually have exactly 1 item. More than 2 = drift.*
 
+- [ ] bug-002 — budget hook matched any CONTEXT.md by basename, not the root file
 
 ## Ready
 

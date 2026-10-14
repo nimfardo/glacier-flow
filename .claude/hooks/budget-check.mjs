@@ -6,10 +6,11 @@
 // them. Budgets are in BYTES because bytes are measurable in the repo -- the token targets beside them
 // are estimates, and an unenforceable budget is a wish.
 //
-//   (no args)    hook mode: reads the tool payload on stdin, checks the edited file if it is budgeted,
-//                exits 2 with the offending lines on stderr so the editing agent sees them
-//   --all        checks every budgeted file under the project root; exit 1 on any failure
-//   --path FILE  checks one file explicitly (tests, gate ledgers); exit 1 on failure
+//   (no args)    hook mode: reads the tool payload on stdin, checks the edited file if it is one of the
+//                budgeted root files, exits 2 with the offending lines on stderr so the editing agent sees them
+//   --all        checks every budgeted file at the project root; exit 1 on any failure
+//   --path FILE  checks one file explicitly against the budget its name carries, wherever it lives
+//                (tests, gate ledgers); exit 1 on failure
 //
 // Unlike gate-check.mjs this hook does not fail open: a refused write is recoverable, an always-load
 // file that quietly doubled is not.
@@ -25,16 +26,21 @@ const FILE_BUDGET_BYTES = {
 }
 const ROW_BUDGET_CHARS = { 'TaskList.md': 240 }
 
-// Budgets are keyed by the real filename; a payload path may arrive in any casing.
+// Budgets are keyed by the real filename of a file at the project root; a payload path may arrive in
+// any casing. A nested file that shares the name (workspaces/*/CONTEXT.md) is not an always-load file.
 const budgetFor = (name) => Object.keys(FILE_BUDGET_BYTES).find((k) => k.toLowerCase() === name.toLowerCase())
 
 const projectDir = path.resolve(process.env.CLAUDE_PROJECT_DIR || process.cwd())
 
-function checkFile(file) {
+// The budget key for a file only when it sits at the project root (separators normalized for Windows).
+const rootBudgetFor = (file) => budgetFor(path.relative(projectDir, file).split(path.sep).join('/'))
+
+// `byName` is the explicit --path check: the caller chose the file, so its name alone picks the budget.
+function checkFile(file, { byName = false } = {}) {
   const problems = []
   if (!existsSync(file)) return problems
   const name = path.basename(file)
-  const key = budgetFor(name)
+  const key = byName ? budgetFor(name) : rootBudgetFor(file)
   if (!key) return problems
 
   const budget = FILE_BUDGET_BYTES[key]
@@ -74,11 +80,12 @@ if (explicit) {
   try { payload = JSON.parse(await readStdin()) } catch { process.exit(0) }
   const target = payload?.tool_input?.file_path ?? payload?.tool_input?.notebook_path
   if (!target) process.exit(0)
-  if (!budgetFor(path.basename(target))) process.exit(0)
-  targets = [path.resolve(projectDir, target)]
+  const resolved = path.resolve(projectDir, target)
+  if (!rootBudgetFor(resolved)) process.exit(0)
+  targets = [resolved]
 }
 
-const found = targets.flatMap(checkFile)
+const found = targets.flatMap((t) => checkFile(t, { byName: Boolean(explicit) }))
 
 if (found.length === 0) {
   if (all || explicit) process.stdout.write(`budget-check: ok (${targets.length} file(s))\n`)

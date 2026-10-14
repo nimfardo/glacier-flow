@@ -5,7 +5,7 @@
 // changes one file rather than two.
 
 import { spawnSync } from 'node:child_process'
-import { mkdtempSync, writeFileSync, copyFileSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
@@ -86,6 +86,18 @@ test('the budgeted names are matched case-insensitively', () => {
   const dir = mkdtempSync(join(tmpdir(), 'budget-'))
   copyFileSync(join(FIX, 'over', 'TaskList.md'), join(dir, 'TaskList.md'))
   eq(run([], { input: JSON.stringify({ tool_input: { file_path: 'tasklist.md' } }), dir }).code, 2)
+})
+
+test('hook mode budgets only the root file, not a nested file that shares its name', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'budget-'))
+  mkdirSync(join(dir, 'workspaces', 'x'), { recursive: true })
+  writeFileSync(join(dir, 'workspaces', 'x', 'CONTEXT.md'), 'x'.repeat(5000))
+  const nested = run([], { input: JSON.stringify({ tool_input: { file_path: join(dir, 'workspaces', 'x', 'CONTEXT.md') } }), dir })
+  eq(nested.code, 0, `a workspace CONTEXT.md is not budgeted: ${nested.err}`)
+
+  writeFileSync(join(dir, 'CONTEXT.md'), 'x'.repeat(5000))
+  eq(run([], { input: JSON.stringify({ tool_input: { file_path: join(dir, 'CONTEXT.md') } }), dir }).code, 2, 'root CONTEXT.md:')
+  eq(run([], { input: JSON.stringify({ tool_input: { file_path: 'context.md' } }), dir }).code, 2, 'relative, other casing:')
 })
 
 await report()

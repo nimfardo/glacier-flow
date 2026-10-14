@@ -194,3 +194,21 @@ met 2026-10-14T16:32:40Z exit=0 digest=329346a5 out="11 run, 11 passed"
 met 2026-10-14T16:32:40Z exit=0 digest=fc1a658b out="budget-check: ok (4 file(s))"
 met 2026-10-14T16:32:40Z exit=0 digest=3fa1853e out="scanned"
 ```
+
+## [2026-10-14] bug | budget hook scoped to the root files
+
+bug-002. `.claude/hooks/budget-check.mjs` matched budgets by basename, so any workspaces/*/CONTEXT.md tripped
+the 4096-byte CONTEXT.md budget on every edit. Hook mode and --all now match by path relative to the project
+root (case-insensitive); explicit `--path FILE` still picks the budget by name, since the caller chose the file.
+Budget numbers unchanged. Regression test added (failed on the old hook, passes now). Resolves the false
+positive noted in the feat-012 entry above.
+
+Evidence (ledger gates/bug-002.md, `--reverify`):
+
+```
+met 2026-10-14T16:45:59Z exit=0 digest=9f44cc9d out="exit:0 size:6636"
+met 2026-10-14T16:45:59Z exit=0 digest=a72a29c9 out="exit:2"
+met 2026-10-14T16:46:02Z exit=0 digest=329346a5 out="12 run, 12 passed"
+met 2026-10-14T16:46:02Z exit=0 digest=fc1a658b out="budget-check: ok (4 file(s))"
+met 2026-10-14T16:46:02Z exit=0 digest=3fa1853e out="scanned"
+```
