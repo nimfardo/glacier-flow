@@ -38,7 +38,6 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Active work. Should usually have exactly 1 item. More than 2 = drift.*
 
-- [ ] feat-012 — Known Failure Patterns table in design-to-code *(plan: design-flow-hardening)*
 
 ## Ready
 
@@ -68,6 +67,7 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Most recent at top. Trim to last ~20; older ones are findable via `wiki/log.md` + git history.*
 
+- [x] feat-012 — Known Failure Patterns table in design-to-code — `99b0d62` *(2026-10-14)*
 - [x] feat-011 — design-system skeleton as inert reference/_presets/ file — `8a4c365` *(2026-10-14)*
 - [x] feat-010 — blinded visual reviewer role for design QA — `5b804ae` *(2026-10-14)*
 - [x] feat-009 — SETUP.md, gate verification as step 1 — `97cf3b4` — gate-owed? yes *(2026-09-23)*
