@@ -38,7 +38,6 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Active work. Should usually have exactly 1 item. More than 2 = drift.*
 
-- [ ] feat-010 — blinded visual reviewer role for design QA *(plan: design-flow-hardening)*
 
 ## Ready
 
@@ -70,6 +69,7 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 
 *Most recent at top. Trim to last ~20; older ones are findable via `wiki/log.md` + git history.*
 
+- [x] feat-010 — blinded visual reviewer role for design QA — `5b804ae` *(2026-10-14)*
 - [x] feat-009 — SETUP.md, gate verification as step 1 — `97cf3b4` — gate-owed? yes *(2026-09-23)*
 - [x] feat-008 — .gitattributes LF pin + zero-CR standard gate — `5e55a48` *(2026-09-23)*
 - [x] feat-007 — budget-check.mjs PostToolUse budget hook — `ce33699` *(2026-09-23)*
