@@ -55,6 +55,8 @@ When a story and its spec describe the same feature, reuse the slug (e.g. `dashb
 - [ ] gates.mjs records the *first* line of output as evidence; the line that matched EXPECT would be better evidence (feat-007 G1 recorded a per-suite count, not the total)
 - [ ] README.md and SETUP.md are in no gate row — neither gated nor listed as exempt, the same hole `.claude/` was in before ref-002
 - [ ] add a standing gate that every commit SHA on the board resolves (`git cat-file -t`) — two were written from memory on 2026-09-23 and only caught by a manual check
+- [ ] opt-in context-full warning to the agent (needs a statusline; settings.local.json only, never project settings)
+- [ ] optional numeric visual diff as a toolbox.md row (pixelmatch/SSIM need npm; visual reviewer stays the gate)
 - [ ] dogfood the template on a real project — every gate so far is verified against a repo with an empty src/ and no test lane
 
 ## Blocked
