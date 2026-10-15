@@ -2,12 +2,16 @@
 
 ![Glacier Flow](https://repository-images.githubusercontent.com/1314860088/d236bc35-3458-4687-a002-5a93777a3cb3)
 
-A general-purpose template combining four complementary patterns:
+A general-purpose template for Claude Code, built to keep AI-assisted product work — code *and* Figma — predictable, cheap and provable. Six patterns work together:
 
-- **Folder-based routing** (ICM, Van Clief) — *how* the AI does work
-- **Markdown knowledge base** (LLM Wiki, Karpathy) — *what* the AI knows
-- **XML task gates** — *what* gets approved before any change
-- **Spec-driven development** (story → spec → plan → build) — *how intent survives contact with implementation*
+- **Folder-based routing** (ICM, Van Clief) — you talk normally; a small routing file loads only the one workspace your request needs, so a session pays for its task and nothing else
+- **Markdown knowledge base** (LLM Wiki, Karpathy) — *what* the AI knows, compiled from immutable sources
+- **XML task gates** — nothing changes until you approve a written task; a hook blocks writes that skip it
+- **Spec-driven planning** (story → spec → plan → build) — *how intent survives contact with implementation*
+- **Evidence ledgers** — "done" means checks that ran and recorded proof, plus manual sign-off for what only a person can see (hover, empty, error states)
+- **Role-based, blinded agents** — an implementer builds; a visual reviewer and a verifier check it without ever seeing the builder's reasoning
+
+Design work is first-class in both directions: Figma → code (`design-to-code`) and building inside Figma (`design-authoring`).
 
 ## Lineage
 
@@ -77,19 +81,49 @@ your-project/
 └── src/                   ← your actual code
 ```
 
-## The Flow
+## How It Works
 
+### 1. Every request is routed to one workspace
+
+A few small files are always loaded (`CLAUDE.md`, `STATE.md`, the rules' non-negotiables, the gate rules). Everything else loads only when the router picks it.
+
+```mermaid
+flowchart LR
+    U["You ask in plain words"] --> R{"CONTEXT.md router"}
+    R -->|"a question"| A["Plain answer, no ceremony"]
+    R -->|"explore options"| B["brainstorm skill"]
+    R -->|"define what to build"| P["planning: story → spec? → plan"]
+    R -->|"build a feature"| F["feature-development"]
+    R -->|"Figma frame → code"| D["design-to-code"]
+    R -->|"build in Figma"| DA["design-authoring"]
+    R -->|"a bug"| DB["debugging"]
+    R -->|"clean up code"| RF["refactoring"]
+    R -->|"sources and wiki"| RS["research"]
+    P -->|"plan approved"| T["TaskList.md: Ready"]
 ```
-brainstorm (ephemeral)
-    ↓ "let's plan this"
-planning workspace
-    ↓ produces story → spec? → plan
-plan approved
-    ↓ tasks move to TaskList.md ## Ready
-feature-development / design-to-code workspace
-    ↓ XML task gate → user approves → write code
-shipped → TaskList.md ## Done + wiki/log.md
+
+### 2. Every change goes through the gate and is checked by someone else
+
+```mermaid
+flowchart TD
+    X["Claude proposes an XML task + its gate ledger"] --> Y{"You approve?"}
+    Y -->|"no / change it"| X
+    Y -->|"yes"| S["Gate opens: .claude/gate-open"]
+    S --> I["Implementer subagent: edits only the files the task lists"]
+    I --> K{"Design task?"}
+    K -->|"yes"| VR["Visual reviewer, blinded: design vs build, state by state"]
+    VR -->|"defects"| I
+    VR -->|"clean"| VF
+    K -->|"no"| VF["Verifier, blinded: re-runs every gate, resolves every assumption"]
+    VF -->|"fails"| I
+    VF -->|"passes"| C["Commit · board · wiki/log.md · STATE.md"]
+    C --> Z["Gate closes"]
 ```
+
+- **Two implement attempts, then it stops and asks you.** A third round means the task is wrong, not the code.
+- **Manual gates** (the hover state, the empty state) stay *owed* until you sign them.
+- **Spend is gated too:** a pricier model or a wide fan-out of agents needs your yes first.
+- **Hooks enforce it:** `gate-check.mjs` blocks gated writes without the open gate; `budget-check.mjs` keeps the always-loaded root files small.
 
 ## First-Time Bootstrap (15–30 min)
 
@@ -167,6 +201,18 @@ The always-load budgets are enforced rather than merely documented: `.claude/hoo
 - **Early prototype:** Minimal fill-in. Skip wiki.
 - **MVP:** Full workspaces. Wiki grows as you research adjacent topics.
 - **Production:** Both fully active. Wiki becomes the team's compounding memory.
+
+## What's Changed
+
+Release-level summary. The task-by-task record, with each gate's evidence, lives in `wiki/log.md`; the work in flight is on `TaskList.md`.
+
+- **2026-10-15 — plan revised from GitHub research.** Ideas from figma/mcp-server-guide, Figma-Context-MCP, figwright, superpowers, spec-kit and BMAD were checked against this template's constraints (Node only, zero dependencies, blinding, cost gate) and folded into `planning/plans/design-flow-hardening.md` as feat-013…020. This README gained the workflow diagrams above.
+- **2026-10-14 — design-flow-hardening, part A** ([#5](https://github.com/nimfardo/glacier-flow/pull/5)). Visual QA moved to a blinded visual reviewer; a design-system preset maps Figma variables to code names and tracks which states are built and signed; design-to-code got a known-failure-patterns table; the budget hook now applies only to the root files (a workspace `CONTEXT.md` no longer raises a false alarm).
+- **2026-09-23 — verification becomes evidence** ([#3](https://github.com/nimfardo/glacier-flow/pull/3), [#4](https://github.com/nimfardo/glacier-flow/pull/4)). Gate ledgers with CHECK / EXPECT / EVIDENCE and a linter that refuses gates that cannot fail; tests for the gate hook; the byte-budget hook; `SETUP.md`; LF line endings pinned.
+- **2026-08-28 — guards and design discipline** ([#2](https://github.com/nimfardo/glacier-flow/pull/2)). Contradiction guard; tool availability record and bulk-rollout discipline in design-to-code; quarterly doc-fitness check; branch + pull request rule for pushes.
+- **2026-08-15 — synced from dragon-ice-flow** ([#1](https://github.com/nimfardo/glacier-flow/pull/1)). Role-based delegation with a cost gate, the cross-platform Node gate hook, and Feature-Sliced Design as an inert preset.
+
+**Next:** feat-013…020 (reading Figma cheaply, session handoff, file-based agent briefs, a Figma build ledger with confirmed rollback, mapping confidence, a states checklist in planning), then feat-015 — one real Figma → code run.
 
 ## Further Reading
 

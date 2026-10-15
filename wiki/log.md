@@ -15,6 +15,15 @@
 
 <!-- new entries go below this line -->
 
+## [2026-10-15] docs | README shows how the flow works and what changed when
+
+docs-003. Intro rewritten around the six patterns actually in use (routing, wiki, gate, spec-driven
+planning, evidence ledgers, blinded role agents) with design named in both directions. The ASCII
+"The Flow" became two Mermaid diagrams — request routing, and the gated change lifecycle with the
+visual reviewer and verifier loops — both rendered once to confirm they parse. New "What's Changed"
+section: dated, linked to PRs #1–#5, and pointing here for task-level evidence rather than copying it.
+GitHub repo description updated to match.
+
 ## [2026-09-23] docs | README caught up with the ledger
 
 docs-001. Seventh divergence recorded (verification as a ledger of evidence), sync marker moved
