@@ -12,6 +12,25 @@ proved itself once on a real Figma frame. Nothing that works today regresses.
 - Read against: `workspaces/design-to-code/CONTEXT.md`, `workspaces/design-authoring/CONTEXT.md`,
   `.context/subagent-delegation.md`, `.context/gates-ledger.md`, `STATE.md` Open Decisions,
   `TaskList.md` Backlog (plan #2 next-action half, dogfood item).
+- Revision 2026-10-15: GitHub research (figma/mcp-server-guide, GLips/Figma-Context-MCP,
+  awdr74100/figwright, obra/superpowers, pedrohcgs/claude-code-my-workflow, github/spec-kit,
+  bmad-code-org/BMAD-METHOD), each idea checked against Glacier's constraints before inclusion.
+  Added feat-016…020; widened feat-013 and feat-014.
+
+## Constraints every new task respects
+
+- **Node 18, zero dependencies** (`SETUP.md`). No npm packages, no Python. Borrowed scripts are
+  rewritten in Node, not copied.
+- **`CLAUDE.md` has ~400 bytes of headroom** (4201 / 4608). Nothing in this plan adds to it.
+- **Hooks are gated (`.claude/`) and tested.** Every new hook ships with a failing-first test in the
+  zero-dependency harness.
+- **Delegation rules win over imports.** Two implement attempts then ask; never a silent tier upgrade;
+  blinding is by file. Anything borrowed that contradicts these is left out
+  (`.context/rules.md` non-negotiable 6).
+- **Scratch goes in `tmp/`** (gitignored, ungated). Never in `gates/` (ledgers only) or `reference/`
+  (would become a second, stale source of truth).
+- **Optional tools are rows in `reference/toolbox.md` with a fallback**, never a hard dependency:
+  template adopters may not have Figma-Context-MCP or the Figma plugin skills.
 
 ## What already exists (do not rebuild)
 
@@ -79,9 +98,9 @@ only (A3, B1 pointers); nothing is pushed to the file. C1 reads node `96:7550` a
     <goal>Reading Figma costs the fewest tokens that still give real values.</goal>
     <files>
       <read>workspaces/design-to-code/CONTEXT.md, workspaces/design-authoring/CONTEXT.md, reference/toolbox.md</read>
-      <write>workspaces/design-to-code/CONTEXT.md (new section "Reading Figma Cheaply"), workspaces/design-authoring/CONTEXT.md (one pointer line)</write>
+      <write>workspaces/design-to-code/CONTEXT.md (new section "Reading Figma Cheaply"), workspaces/design-authoring/CONTEXT.md (one pointer line), reference/toolbox.md (rows: Figma-Context-MCP, Figma plugin skills — status [?], with fallback)</write>
     </files>
-    <action>Rules: one node per task, never the whole file; metadata before full design context; values already in reference/design-system.md are reused, not re-pulled; screenshots only for final visual QA. Defined once in design-to-code; design-authoring links to it.</action>
+    <action>Rules: one read-only file inventory per session (pages, variable collections + modes, component sets, styles), cached in tmp/ and valid for that session only; then one node per task at limited depth, never the whole file; metadata before full design context; values already in reference/design-system.md are reused, not re-pulled; screenshots only for final visual QA. Defined once in design-to-code; design-authoring links to it. Source: figma/mcp-server-guide inspectFileStructure.js, Figma-Context-MCP depth + globalVars.</action>
     <verify>ledger gates/feat-013.md — G1 section present, G2 authoring links rather than copies, R1–R4 (R2 matters: workspace files are not budgeted, always-load files must stay green)</verify>
   </task>
   <task id="feat-014">
@@ -93,9 +112,56 @@ only (A3, B1 pointers); nothing is pushed to the file. C1 reads node `96:7550` a
     <action>Absorbs the "STATE NEXT ACTION" half of backlogged plan #2; the board line is updated to say so. STATE.md must stay inside its byte budget — trim, never raise the budget.</action>
     <verify>ledger gates/feat-014.md — G1 Next Action section exists and is one line, G2 appendix rule present, R1–R4</verify>
   </task>
+  <task id="feat-016" depends="feat-014">
+    <goal>The Next Action survives compaction and new sessions without the user re-explaining.</goal>
+    <files>
+      <read>.claude/settings.json, .claude/hooks/*.mjs, .claude/scripts/tests/harness.mjs, STATE.md</read>
+      <write>.claude/hooks/handoff.mjs, .claude/settings.json (PreCompact + SessionStart compact|resume), .claude/scripts/tests/handoff.test.mjs</write>
+    </files>
+    <action>Node port of the idea in pedrohcgs/claude-code-my-workflow (pre-compact / post-compact-restore). PreCompact records the in-progress task id + STATE Next Action into tmp/; SessionStart (compact|resume only) injects at most ~5 lines. PRECONDITION, checked first and recorded in the ledger: SessionStart does not fire inside subagents; if it does, the hook must no-op there, or blinding breaks. Hook failure never blocks a session (exit 0 on error).</action>
+    <verify>ledger gates/feat-016.md — G1 restore output ≤5 lines, G2 no-op without a checkpoint, G3 subagent precondition evidenced, G4 failing-first test, R1–R4</verify>
+  </task>
+  <task id="feat-017">
+    <goal>Subagents get their task as a file, so the orchestrator stops paying to paste it and a compaction cannot lose progress.</goal>
+    <files>
+      <read>.context/subagent-delegation.md</read>
+      <write>.context/subagent-delegation.md (Sequence per Approved Task)</write>
+    </files>
+    <action>From obra/superpowers subagent-driven-development: brief = the XML task verbatim written to tmp/briefs/<id>.md; progress = tmp/progress.md with "<id>: complete" lines read before dispatching. Briefs never carry implementer notes (blinding). NOT imported: its 5 fix rounds and round-4 model upgrade — Glacier keeps two attempts then ask, and the cost gate.</action>
+    <verify>ledger gates/feat-017.md — G1 brief + progress rule present, G2 two-attempt rule and cost gate text unchanged, R1–R4</verify>
+  </task>
 
-  <phase>C · prove it</phase>
-  <task id="feat-015" depends="feat-010,feat-011,feat-012,feat-013,feat-014">
+  <phase>D · design depth</phase>
+  <task id="feat-018">
+    <goal>A multi-step Figma build can be resumed or undone without touching the user's own nodes.</goal>
+    <files>
+      <read>workspaces/design-authoring/CONTEXT.md</read>
+      <write>workspaces/design-authoring/CONTEXT.md (Plugin API rules + Known Failure Patterns)</write>
+    </files>
+    <action>From figma/mcp-server-guide error-recovery.md: keep a created-IDs list per build (in tmp/, named for the task); check it before creating; rerun is idempotent; rollback deletes by exact ID only, never by name prefix, and only after an explicit yes (a Figma deletion is treated like a file deletion, non-negotiable 3). Route to the figma plugin skills via reference/toolbox.md, not as a hard dependency. Text only; no Figma call in this task.</action>
+    <verify>ledger gates/feat-018.md — G1 ledger + exact-ID rollback rule present, G2 rollback requires confirmation, G3 no name-prefix cleanup advised, R1–R4</verify>
+  </task>
+  <task id="feat-019" depends="feat-011">
+    <goal>Figma → code reads a confirmed mapping first and treats guesses as guesses.</goal>
+    <files>
+      <read>reference/_presets/design-system.md, workspaces/design-to-code/CONTEXT.md</read>
+      <write>reference/_presets/design-system.md, workspaces/design-to-code/CONTEXT.md (Process step 2, one line)</write>
+    </files>
+    <action>From awdr74100/figwright figma-codegen: add a status column (confirmed / likely / guess / unmapped) and "ambiguous with" to the token and component tables; rule: a value-only match is a guess, and a semantically wrong token is worse than a raw value. Rules only — no figwright server or plugin.</action>
+    <verify>ledger gates/feat-019.md — G1 status column in both tables, G2 guess rule present in one place only, R1–R4</verify>
+  </task>
+  <task id="feat-020">
+    <goal>Missing design states are caught in planning, before any Figma or code work.</goal>
+    <files>
+      <read>workspaces/planning/CONTEXT.md, planning/stories/_template-full.md</read>
+      <write>workspaces/planning/CONTEXT.md, planning/stories/_template-full.md</write>
+    </files>
+    <action>From github/spec-kit checklist.md and BMAD bmad-ux: an optional requirements checklist for multi-screen work ("are hover/empty/error/loading specified for every interactive element?") and a surface-closure check (every need has a screen; every screen has a journey that reaches it). Lightweight stories stay the default; no separate EXPERIENCE.md.</action>
+    <verify>ledger gates/feat-020.md — G1 checklist present and marked optional, G2 closure check in the full template only, G3 lightweight template unchanged, R1–R4</verify>
+  </task>
+
+  <phase>E · prove it</phase>
+  <task id="feat-015" depends="feat-010,feat-011,feat-012,feat-013,feat-014,feat-016,feat-017,feat-018,feat-019,feat-020">
     <goal>One real Figma → code task runs end to end on CortiPix node 96:7550 under the new rules.</goal>
     <files>
       <read>Figma node 96:7550 (read-only), the five workspace/rule files above</read>
@@ -110,7 +176,9 @@ only (A3, B1 pointers); nothing is pushed to the file. C1 reads node `96:7550` a
 ## Open Questions
 
 - **feat-015 code target.** Where does the code for node 96:7550 live: an existing CortiPix repo, or
-  `src/` in a fresh template clone? And which stack? Blocks feat-015 only; A and B proceed.
+  `src/` in a fresh template clone? And which stack? Blocks feat-015 only; A–D proceed.
+- **feat-016 precondition.** Does SessionStart fire inside subagents? Answered and evidenced before the
+  hook is written; if unknown, the hook no-ops whenever it cannot prove it runs in the main session.
 
 ## Risks
 
@@ -120,6 +188,11 @@ only (A3, B1 pointers); nothing is pushed to the file. C1 reads node `96:7550` a
   budget.
 - **Figma accidentally mutated.** Mitigation: no task in this plan calls a Figma write tool; C1 is
   design-to-code (reads only). The Figma gate is convention-only, so this line is the guard.
+- **A hook breaks blinding or sessions (feat-016).** Mitigation: subagent precondition gate; hook
+  exits 0 on any error; restore output capped.
+- **Imported practice contradicts a rule (feat-017).** Mitigation: G2 proves the two-attempt rule and
+  cost gate are byte-for-byte unchanged.
+- **Figma rollback deletes user work (feat-018).** Mitigation: exact-ID only, explicit yes required.
 - **Verifier and visual reviewer overlap.** Mitigation: verifier checks gates and diff; visual
   reviewer checks pixels and states. Different inputs, written in the blinding table.
 
@@ -127,8 +200,14 @@ only (A3, B1 pointers); nothing is pushed to the file. C1 reads node `96:7550` a
 
 - ECC's skill library, multi-harness adapters, and auto-learning memory.
 - A "failed-before" baseline mode in `gates.mjs` (stays in Backlog; code-oriented).
+- Context-full warning to the agent (get-shit-done): needs a statusline, and a project statusline
+  would override adopters' own. Backlog, opt-in via `settings.local.json` only.
+- Numeric visual diff (pixelmatch/SSIM, imugi): needs npm packages. Backlog, as an optional
+  `toolbox.md` row at most; the visual reviewer stays the gate.
+- Design diff per node (figwright), DESIGN.md token format (google-labs-code), delta specs
+  (OpenSpec): later, or duplicates `design-system.md`.
 - The log-archive half of plan #2 (still deferred until `wiki/log.md` has volume).
 
 ## Status
 
-approved
+in-progress — A done (feat-010…012, plus bug-002); B–D revised 2026-10-15, awaiting approval
